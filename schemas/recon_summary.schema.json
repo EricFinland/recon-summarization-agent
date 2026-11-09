@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "recon_summary.schema.json",
+  "title": "ReconSummary",
+  "description": "DRAFT. Output contract between the recon summarization agent and Group 2's classification agent. Fields TBD; agree with Group 2 before changing.",
+  "type": "object",
+  "properties": {}
+}

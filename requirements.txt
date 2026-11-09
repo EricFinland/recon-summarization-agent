@@ -1,0 +1,4 @@
+# Runtime dependencies for the recon summarization agent.
+# Add the LLM client library here once the team picks a provider.
+pydantic>=2.7
+python-dotenv>=1.0

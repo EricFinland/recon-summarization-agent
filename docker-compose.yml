@@ -1,0 +1,9 @@
+services:
+  recon-agent:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./data:/app/data:ro
+      - ./output:/app/output
