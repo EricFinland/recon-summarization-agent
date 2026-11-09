@@ -1,0 +1,70 @@
+{
+  "scan_id": "synthetic-001",
+  "scanner": "synthetic-generator",
+  "scan_type": "tcp_connect",
+  "started_at": "2026-11-01T14:00:00Z",
+  "finished_at": "2026-11-01T14:06:42Z",
+  "target_range": "10.10.20.0/24",
+  "hosts": [
+    {
+      "ip": "10.10.20.5",
+      "hostname": "web01.lab.local",
+      "status": "up",
+      "os_guess": "Linux 5.x",
+      "ports": [
+        { "port": 22, "protocol": "tcp", "state": "open", "service": "ssh", "product": "OpenSSH", "version": "8.9p1" },
+        { "port": 80, "protocol": "tcp", "state": "open", "service": "http", "product": "nginx", "version": "1.18.0" },
+        { "port": 443, "protocol": "tcp", "state": "open", "service": "https", "product": "nginx", "version": "1.18.0" },
+        { "port": 8080, "protocol": "tcp", "state": "filtered", "service": "http-proxy", "product": null, "version": null }
+      ],
+      "notes": [
+        "HTTP title: 'Lab Intranet Portal'",
+        "TLS certificate expired on 2026-09-30"
+      ]
+    },
+    {
+      "ip": "10.10.20.12",
+      "hostname": "db01.lab.local",
+      "status": "up",
+      "os_guess": null,
+      "ports": [
+        { "port": 3306, "protocol": "tcp", "state": "open", "service": "mysql", "product": "MySQL", "version": "5.7.38" },
+        { "port": 22, "protocol": "tcp", "state": "closed", "service": "ssh", "product": null, "version": null }
+      ],
+      "notes": [
+        "MySQL accepts connections from the scanner host"
+      ]
+    },
+    {
+      "ip": "10.10.20.30",
+      "hostname": null,
+      "status": "up",
+      "os_guess": "Windows Server 2019",
+      "ports": [
+        { "port": 445, "protocol": "tcp", "state": "open", "service": "microsoft-ds", "product": null, "version": null },
+        { "port": 3389, "protocol": "tcp", "state": "open", "service": "ms-wbt-server", "product": null, "version": null }
+      ],
+      "notes": [
+        "SMB signing not required"
+      ]
+    },
+    {
+      "ip": "10.10.20.44",
+      "hostname": "printer.lab.local",
+      "status": "up",
+      "os_guess": null,
+      "ports": [],
+      "notes": [
+        "Host responded to ping but no ports were open in the scanned range"
+      ]
+    },
+    {
+      "ip": "10.10.20.99",
+      "hostname": null,
+      "status": "down",
+      "os_guess": null,
+      "ports": [],
+      "notes": []
+    }
+  ]
+}
