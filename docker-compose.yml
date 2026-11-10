@@ -1,9 +1,40 @@
+# Default service: no network, no LLM. Demonstrates least privilege: the agent
+# only reads the mounted scan files and writes to ./output.
+#   docker compose run --rm recon-agent
+#   docker compose run --rm recon-agent --input data/scans/sample_scan_03.xml --stdout
+#
+# LLM service (profile "llm"): has network access and reads .env for
+# LLM_PROVIDER, LLM_MODEL, and LLM_API_KEY.
+#   docker compose --profile llm run --rm recon-agent-llm
+#
+# On Linux, if ./output is not writable by uid 10001, run with your own ids:
+#   RECON_UID=$(id -u) RECON_GID=$(id -g) docker compose run --rm recon-agent
+
+x-agent: &agent
+  build: .
+  image: recon-agent:local
+  user: "${RECON_UID:-10001}:${RECON_GID:-10001}"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  tmpfs: [/tmp]
+  volumes:
+    - ./data:/app/data:ro
+    - ./output:/app/output
+
 services:
   recon-agent:
-    build: .
+    <<: *agent
+    network_mode: none
+    environment:
+      LLM_PROVIDER: none
+
+  recon-agent-llm:
+    <<: *agent
+    profiles: [llm]
     env_file:
       - path: .env
         required: false
-    volumes:
-      - ./data:/app/data:ro
-      - ./output:/app/output
+    extra_hosts:
+      # Lets OLLAMA_HOST=http://host.docker.internal:11434 reach Ollama on the host (Linux too).
+      - "host.docker.internal:host-gateway"

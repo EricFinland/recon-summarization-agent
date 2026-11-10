@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nmaprun scanner="nmap" start="1793700000">
+  <host>
+    <status state="up"/>
+    <address addr="10.0.0.1" addrtype="ipv4"/>
+  </hostt>
+</nmaprun>

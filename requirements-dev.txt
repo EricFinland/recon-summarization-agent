@@ -1,3 +1,4 @@
 -r requirements.txt
 pytest>=8.0
-ruff>=0.5
+# Pinned so `ruff format --check` gives the same result locally and in CI.
+ruff==0.17.4

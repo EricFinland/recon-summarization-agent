@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.2.0",
   "generated_at": "2026-11-01T14:10:00Z",
   "source": {
     "scan_file": "sample_scan_01.json",
@@ -19,16 +19,47 @@
       "status": "up",
       "os_guess": "Linux 5.x",
       "open_ports": [
-        { "port": 22, "protocol": "tcp", "service": "ssh", "product": "OpenSSH", "version": "8.9p1" },
-        { "port": 80, "protocol": "tcp", "service": "http", "product": "nginx", "version": "1.18.0" },
-        { "port": 443, "protocol": "tcp", "service": "https", "product": "nginx", "version": "1.18.0" }
+        {
+          "port": 22,
+          "protocol": "tcp",
+          "service": "ssh",
+          "product": "OpenSSH",
+          "version": "8.9p1"
+        },
+        {
+          "port": 80,
+          "protocol": "tcp",
+          "service": "http",
+          "product": "nginx",
+          "version": "1.18.0"
+        },
+        {
+          "port": 443,
+          "protocol": "tcp",
+          "service": "https",
+          "product": "nginx",
+          "version": "1.18.0"
+        }
       ],
       "other_ports": [
-        { "port": 8080, "protocol": "tcp", "state": "filtered", "service": "http-proxy" }
+        {
+          "port": 8080,
+          "protocol": "tcp",
+          "state": "filtered",
+          "service": "http-proxy"
+        }
       ],
       "observations": [
-        { "text": "HTTP title is 'Lab Intranet Portal'.", "evidence": "hosts[0].notes[0]" },
-        { "text": "TLS certificate expired on 2026-09-30.", "evidence": "hosts[0].notes[1]" }
+        {
+          "text": "HTTP title: 'Lab Intranet Portal'",
+          "evidence": "hosts[0].notes[0]",
+          "flags": []
+        },
+        {
+          "text": "TLS certificate expired on 2026-09-30",
+          "evidence": "hosts[0].notes[1]",
+          "flags": []
+        }
       ]
     },
     {
@@ -37,13 +68,28 @@
       "status": "up",
       "os_guess": null,
       "open_ports": [
-        { "port": 3306, "protocol": "tcp", "service": "mysql", "product": "MySQL", "version": "5.7.38" }
+        {
+          "port": 3306,
+          "protocol": "tcp",
+          "service": "mysql",
+          "product": "MySQL",
+          "version": "5.7.38"
+        }
       ],
       "other_ports": [
-        { "port": 22, "protocol": "tcp", "state": "closed", "service": "ssh" }
+        {
+          "port": 22,
+          "protocol": "tcp",
+          "state": "closed",
+          "service": "ssh"
+        }
       ],
       "observations": [
-        { "text": "MySQL accepts connections from the scanner host.", "evidence": "hosts[1].notes[0]" }
+        {
+          "text": "MySQL accepts connections from the scanner host",
+          "evidence": "hosts[1].notes[0]",
+          "flags": []
+        }
       ]
     },
     {
@@ -52,12 +98,28 @@
       "status": "up",
       "os_guess": "Windows Server 2019",
       "open_ports": [
-        { "port": 445, "protocol": "tcp", "service": "microsoft-ds", "product": null, "version": null },
-        { "port": 3389, "protocol": "tcp", "service": "ms-wbt-server", "product": null, "version": null }
+        {
+          "port": 445,
+          "protocol": "tcp",
+          "service": "microsoft-ds",
+          "product": null,
+          "version": null
+        },
+        {
+          "port": 3389,
+          "protocol": "tcp",
+          "service": "ms-wbt-server",
+          "product": null,
+          "version": null
+        }
       ],
       "other_ports": [],
       "observations": [
-        { "text": "SMB signing is not required.", "evidence": "hosts[2].notes[0]" }
+        {
+          "text": "SMB signing not required",
+          "evidence": "hosts[2].notes[0]",
+          "flags": []
+        }
       ]
     },
     {
@@ -68,7 +130,11 @@
       "open_ports": [],
       "other_ports": [],
       "observations": [
-        { "text": "Host responded to ping but had no open ports in the scanned range.", "evidence": "hosts[3].notes[0]" }
+        {
+          "text": "Host responded to ping but no ports were open in the scanned range",
+          "evidence": "hosts[3].notes[0]",
+          "flags": []
+        }
       ]
     },
     {

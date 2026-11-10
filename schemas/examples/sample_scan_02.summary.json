@@ -1,0 +1,275 @@
+{
+  "schema_version": "0.2.0",
+  "generated_at": "2026-11-02T09:45:00Z",
+  "source": {
+    "scan_file": "sample_scan_02.json",
+    "scan_id": "synthetic-002",
+    "target_range": "192.168.56.0/24, 2001:db8:56::/64"
+  },
+  "overview": {
+    "hosts_total": 7,
+    "hosts_up": 5,
+    "open_ports_total": 10,
+    "summary_text": "7 hosts listed in 192.168.56.0/24, 2001:db8:56::/64: 5 up, 1 down, 1 with unknown status. 10 open ports across 5 hosts (FTP, SSH, HTTP/HTTPS, DNS, SMTP, IPP, JetDirect). 3 notes were withheld because they contain instruction-like text, and 1 note was truncated."
+  },
+  "hosts": [
+    {
+      "ip": "192.168.56.10",
+      "hostname": "files01.lab.local",
+      "status": "up",
+      "os_guess": "Linux 4.x",
+      "open_ports": [
+        {
+          "port": 21,
+          "protocol": "tcp",
+          "service": "ftp",
+          "product": "vsftpd",
+          "version": "3.0.3"
+        },
+        {
+          "port": 22,
+          "protocol": "tcp",
+          "service": "ssh",
+          "product": "OpenSSH",
+          "version": "8.2p1"
+        }
+      ],
+      "other_ports": [
+        {
+          "port": 139,
+          "protocol": "tcp",
+          "state": "closed",
+          "service": "netbios-ssn"
+        }
+      ],
+      "observations": [
+        {
+          "text": "Anonymous FTP login allowed (FTP code 230)",
+          "evidence": "hosts[0].notes[0]",
+          "flags": []
+        },
+        {
+          "text": "Note withheld from summary: it contains instruction-like text. Review the raw scan file at the evidence path.",
+          "evidence": "hosts[0].notes[1]",
+          "flags": [
+            "possible_prompt_injection"
+          ]
+        }
+      ]
+    },
+    {
+      "ip": "192.168.56.20",
+      "hostname": "web02.lab.local",
+      "status": "up",
+      "os_guess": "Linux 5.x",
+      "open_ports": [
+        {
+          "port": 80,
+          "protocol": "tcp",
+          "service": "http",
+          "product": "Apache httpd",
+          "version": "2.4.41"
+        },
+        {
+          "port": 443,
+          "protocol": "tcp",
+          "service": "https",
+          "product": "Apache httpd",
+          "version": "2.4.41"
+        }
+      ],
+      "other_ports": [
+        {
+          "port": 8443,
+          "protocol": "tcp",
+          "state": "filtered",
+          "service": "https-alt"
+        }
+      ],
+      "observations": [
+        {
+          "text": "Note withheld from summary: it contains instruction-like text. Review the raw scan file at the evidence path.",
+          "evidence": "hosts[1].notes[0]",
+          "flags": [
+            "possible_prompt_injection"
+          ]
+        },
+        {
+          "text": "http-headers: Date: Mon, 02 Nov 2026 09:35:12 GMT; Server: Apache/2.4.41 (Ubuntu); Last-Modified: Tue, 14 Jul 2026 08:12:40 GMT; ETag: \"2aa6-5f1c3b2e8a1c0\"; Accept-Ranges: bytes; Content-Length: 10918; Vary: Accept-Encoding; Connection: close; Content-Type: text/html; charset=UTF-8; X-Powered-By: PHP/7.4.3; Set-Cookie: PHPSESSID=0f1e2d3c4b5a69788796a5b4c3d2e1f0; path=/; Cache-Control: no-store, no-cache, must-revalidate; Pragma: no-cache; X-Frame-Options: not set; X-Content-Type-Options: not set",
+          "evidence": "hosts[1].notes[1]",
+          "flags": [
+            "truncated"
+          ]
+        },
+        {
+          "text": "TLS certificate is self-signed (issuer: CN=web02.lab.local)",
+          "evidence": "hosts[1].notes[2]",
+          "flags": []
+        },
+        {
+          "text": "Directory listing enabled at /backup/",
+          "evidence": "hosts[1].notes[4]",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "ip": "192.168.56.30",
+      "hostname": "dns01.lab.local",
+      "status": "up",
+      "os_guess": null,
+      "open_ports": [
+        {
+          "port": 53,
+          "protocol": "udp",
+          "service": "domain",
+          "product": "ISC BIND",
+          "version": "9.16.1"
+        },
+        {
+          "port": 53,
+          "protocol": "tcp",
+          "service": "domain",
+          "product": "ISC BIND",
+          "version": "9.16.1"
+        }
+      ],
+      "other_ports": [
+        {
+          "port": 161,
+          "protocol": "udp",
+          "state": "open|filtered",
+          "service": "snmp"
+        },
+        {
+          "port": 69,
+          "protocol": "udp",
+          "state": "closed",
+          "service": "tftp"
+        }
+      ],
+      "observations": [
+        {
+          "text": "DNS server answers recursive queries from the scanner host",
+          "evidence": "hosts[2].notes[0]",
+          "flags": []
+        },
+        {
+          "text": "No response to SNMP probes on 161/udp",
+          "evidence": "hosts[2].notes[1]",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "ip": "2001:db8:56::25",
+      "hostname": "mail01.lab.local",
+      "status": "up",
+      "os_guess": null,
+      "open_ports": [
+        {
+          "port": 25,
+          "protocol": "tcp",
+          "service": "smtp",
+          "product": "Postfix smtpd",
+          "version": null
+        },
+        {
+          "port": 587,
+          "protocol": "tcp",
+          "service": "submission",
+          "product": "Postfix smtpd",
+          "version": null
+        }
+      ],
+      "other_ports": [
+        {
+          "port": 110,
+          "protocol": "tcp",
+          "state": "closed",
+          "service": "pop3"
+        }
+      ],
+      "observations": [
+        {
+          "text": "SMTP server supports STARTTLS",
+          "evidence": "hosts[3].notes[0]",
+          "flags": []
+        },
+        {
+          "text": "SMTP relay test: relaying denied for external recipients",
+          "evidence": "hosts[3].notes[1]",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "ip": "192.168.56.40",
+      "hostname": null,
+      "status": "unknown",
+      "os_guess": null,
+      "open_ports": [],
+      "other_ports": [
+        {
+          "port": 3389,
+          "protocol": "tcp",
+          "state": "unknown",
+          "service": "ms-wbt-server"
+        }
+      ],
+      "observations": [
+        {
+          "text": "Host did not answer ICMP echo; status could not be determined",
+          "evidence": "hosts[4].notes[0]",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "ip": "192.168.56.50",
+      "hostname": "printer02.lab.local",
+      "status": "up",
+      "os_guess": "HP embedded",
+      "open_ports": [
+        {
+          "port": 631,
+          "protocol": "tcp",
+          "service": "ipp",
+          "product": "CUPS",
+          "version": "2.3"
+        },
+        {
+          "port": 9100,
+          "protocol": "tcp",
+          "service": "jetdirect",
+          "product": null,
+          "version": null
+        }
+      ],
+      "other_ports": [],
+      "observations": [
+        {
+          "text": "HTTP title: 'Printer Status'",
+          "evidence": "hosts[5].notes[0]",
+          "flags": []
+        },
+        {
+          "text": "Note withheld from summary: it contains instruction-like text. Review the raw scan file at the evidence path.",
+          "evidence": "hosts[5].notes[1]",
+          "flags": [
+            "possible_prompt_injection"
+          ]
+        }
+      ]
+    },
+    {
+      "ip": "192.168.56.60",
+      "hostname": null,
+      "status": "down",
+      "os_guess": null,
+      "open_ports": [],
+      "other_ports": [],
+      "observations": []
+    }
+  ]
+}

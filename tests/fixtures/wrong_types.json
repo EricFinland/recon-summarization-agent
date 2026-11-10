@@ -1,0 +1,13 @@
+{
+  "scan_id": "fixture-wrong-types",
+  "hosts": [
+    {
+      "ip": "10.0.0.1",
+      "status": "online",
+      "ports": [
+        { "port": "22", "protocol": "tcp", "state": "open" }
+      ],
+      "notes": "notes should be a list"
+    }
+  ]
+}

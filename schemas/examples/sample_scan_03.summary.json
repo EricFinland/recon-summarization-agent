@@ -1,0 +1,153 @@
+{
+  "schema_version": "0.2.0",
+  "generated_at": "2026-11-03T10:10:00Z",
+  "source": {
+    "scan_file": "sample_scan_03.xml",
+    "scan_id": null,
+    "target_range": null
+  },
+  "overview": {
+    "hosts_total": 4,
+    "hosts_up": 3,
+    "open_ports_total": 7,
+    "summary_text": "4 hosts listed in an Nmap scan: 3 up, 1 down. 7 open ports across 3 hosts (SSH, HTTP, MSRPC, NetBIOS, SMB, SNMP)."
+  },
+  "hosts": [
+    {
+      "ip": "172.16.30.5",
+      "hostname": "web03.lab.local",
+      "status": "up",
+      "os_guess": "Linux 4.15 - 5.8",
+      "open_ports": [
+        {
+          "port": 22,
+          "protocol": "tcp",
+          "service": "ssh",
+          "product": "OpenSSH",
+          "version": "7.4"
+        },
+        {
+          "port": 80,
+          "protocol": "tcp",
+          "service": "http",
+          "product": "nginx",
+          "version": "1.14.0"
+        },
+        {
+          "port": 443,
+          "protocol": "tcp",
+          "service": "http",
+          "product": "nginx",
+          "version": "1.14.0"
+        }
+      ],
+      "other_ports": [
+        {
+          "port": 3306,
+          "protocol": "tcp",
+          "state": "closed",
+          "service": "mysql"
+        },
+        {
+          "port": 8080,
+          "protocol": "tcp",
+          "state": "filtered",
+          "service": "http-proxy"
+        }
+      ],
+      "observations": [
+        {
+          "text": "80/tcp http-title: Staff Wiki",
+          "evidence": "hosts[0].notes[0]",
+          "flags": []
+        },
+        {
+          "text": "80/tcp http-server-header: nginx/1.14.0",
+          "evidence": "hosts[0].notes[1]",
+          "flags": []
+        },
+        {
+          "text": "443/tcp ssl-cert: Subject: commonName=web03.lab.local Issuer: commonName=Lab Internal CA Not valid before: 2025-01-15T00:00:00 Not valid after: 2026-01-15T00:00:00",
+          "evidence": "hosts[0].notes[2]",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "ip": "172.16.30.10",
+      "hostname": "fs02.lab.local",
+      "status": "up",
+      "os_guess": "Microsoft Windows Server 2016",
+      "open_ports": [
+        {
+          "port": 135,
+          "protocol": "tcp",
+          "service": "msrpc",
+          "product": "Microsoft Windows RPC",
+          "version": null
+        },
+        {
+          "port": 139,
+          "protocol": "tcp",
+          "service": "netbios-ssn",
+          "product": "Microsoft Windows netbios-ssn",
+          "version": null
+        },
+        {
+          "port": 445,
+          "protocol": "tcp",
+          "service": "microsoft-ds",
+          "product": null,
+          "version": null
+        }
+      ],
+      "other_ports": [],
+      "observations": [
+        {
+          "text": "smb-security-mode: account_used: guest authentication_level: user challenge_response: supported message_signing: disabled (dangerous, but default)",
+          "evidence": "hosts[1].notes[0]",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "ip": "172.16.30.14",
+      "hostname": null,
+      "status": "up",
+      "os_guess": null,
+      "open_ports": [
+        {
+          "port": 161,
+          "protocol": "udp",
+          "service": "snmp",
+          "product": "net-snmp",
+          "version": "SNMPv3 server"
+        }
+      ],
+      "other_ports": [
+        {
+          "port": 123,
+          "protocol": "udp",
+          "state": "open|filtered",
+          "service": "ntp"
+        }
+      ],
+      "observations": [
+        {
+          "text": "161/udp snmp-info: enterprise: net-snmp engineIDFormat: unknown snmpEngineBoots: 4 snmpEngineTime: 12d03h",
+          "evidence": "hosts[2].notes[0]",
+          "flags": []
+        }
+      ]
+    },
+    {
+      "ip": "172.16.30.9",
+      "hostname": null,
+      "status": "down",
+      "os_guess": null,
+      "open_ports": [],
+      "other_ports": [],
+      "observations": []
+    }
+  ]
+}

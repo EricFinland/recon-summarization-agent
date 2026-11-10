@@ -1,0 +1,16 @@
+{
+  "schema_version": "0.2.0",
+  "generated_at": "2026-11-04T16:05:00Z",
+  "source": {
+    "scan_file": "sample_scan_04_empty.json",
+    "scan_id": "synthetic-004",
+    "target_range": "10.10.40.0/28"
+  },
+  "overview": {
+    "hosts_total": 0,
+    "hosts_up": 0,
+    "open_ports_total": 0,
+    "summary_text": "The scan lists no hosts in 10.10.40.0/28."
+  },
+  "hosts": []
+}

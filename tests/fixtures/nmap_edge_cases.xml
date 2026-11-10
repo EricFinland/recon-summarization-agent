@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sA -sS -O -oX nmap_edge_cases.xml 10.0.0.0/30" start="1793700000">
+  <scaninfo type="ack" protocol="tcp" numservices="3" services="22,80,443"/>
+  <scaninfo type="syn" protocol="tcp" numservices="3" services="22,80,443"/>
+  <host>
+    <status state="up" reason="arp-response"/>
+    <address addr="00:00:5E:00:53:01" addrtype="mac"/>
+    <address addr="10.0.0.1" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="edge01.lab.local" type="user"/>
+      <hostname name="edge01-alt.lab.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="unfiltered" reason="reset"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="closed|filtered" reason="no-response"/>
+        <service name="http" method="table" conf="3"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack"/>
+        <service name="https" method="table" conf="3"/>
+        <script id="http-title" output="Edge Router Login"/>
+        <script id="ssl-date" output="TLS randomness does not represent time"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Embedded Linux 3.x" accuracy="88"/>
+      <osmatch name="Linux 4.4" accuracy="93"/>
+      <osmatch name="Linux 4.9" accuracy="93"/>
+    </os>
+    <hostscript>
+      <script id="clock-skew" output="mean: 0s, deviation: 0s, median: 0s"/>
+    </hostscript>
+  </host>
+  <host>
+    <status state="skipped" reason="user-set"/>
+    <address addr="2001:db8::2" addrtype="ipv6"/>
+  </host>
+  <runstats>
+    <finished time="1793700060"/>
+  </runstats>
+</nmaprun>

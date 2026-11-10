@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<!-- Synthetic Nmap -oX output for testing. Not from a real scan. See data/CATALOG.md. -->
+<nmaprun scanner="nmap" args="nmap -sS -sU -sV -sC -O -p T:22,80,443,135,139,445,3306,8080,U:123,161 -oX sample_scan_03.xml 172.16.30.0/28" start="1793700000" startstr="Tue Nov  3 10:00:00 2026" version="7.94" xmloutputversion="1.05">
+  <scaninfo type="syn" protocol="tcp" numservices="8" services="22,80,135,139,443,445,3306,8080"/>
+  <scaninfo type="udp" protocol="udp" numservices="2" services="123,161"/>
+  <verbose level="1"/>
+  <debugging level="0"/>
+  <host starttime="1793700003" endtime="1793700241">
+    <status state="up" reason="echo-reply" reason_ttl="63"/>
+    <address addr="172.16.30.5" addrtype="ipv4"/>
+    <address addr="00:00:5E:00:53:05" addrtype="mac"/>
+    <hostnames>
+      <hostname name="web03.lab.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <extraports state="closed" count="3">
+        <extrareasons reason="reset" count="3" proto="tcp" ports="135,139,445"/>
+      </extraports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="63"/>
+        <service name="ssh" product="OpenSSH" version="7.4" extrainfo="protocol 2.0" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack" reason_ttl="63"/>
+        <service name="http" product="nginx" version="1.14.0" method="probed" conf="10"/>
+        <script id="http-title" output="Staff Wiki"/>
+        <script id="http-server-header" output="nginx/1.14.0"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="63"/>
+        <service name="http" product="nginx" version="1.14.0" tunnel="ssl" method="probed" conf="10"/>
+        <script id="ssl-cert" output="Subject: commonName=web03.lab.local&#xa;Issuer: commonName=Lab Internal CA&#xa;Not valid before: 2025-01-15T00:00:00&#xa;Not valid after:  2026-01-15T00:00:00"/>
+      </port>
+      <port protocol="tcp" portid="3306">
+        <state state="closed" reason="reset" reason_ttl="63"/>
+        <service name="mysql" method="table" conf="3"/>
+      </port>
+      <port protocol="tcp" portid="8080">
+        <state state="filtered" reason="no-response" reason_ttl="0"/>
+        <service name="http-proxy" method="table" conf="3"/>
+      </port>
+    </ports>
+    <os>
+      <portused state="open" proto="tcp" portid="22"/>
+      <osmatch name="Linux 4.15 - 5.8" accuracy="96" line="67079">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="4.X" accuracy="96"/>
+      </osmatch>
+      <osmatch name="Linux 5.0 - 5.4" accuracy="95" line="67515">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="5.X" accuracy="95"/>
+      </osmatch>
+    </os>
+  </host>
+  <host starttime="1793700003" endtime="1793700255">
+    <status state="up" reason="echo-reply" reason_ttl="127"/>
+    <address addr="172.16.30.10" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="fs02.lab.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="135">
+        <state state="open" reason="syn-ack" reason_ttl="127"/>
+        <service name="msrpc" product="Microsoft Windows RPC" ostype="Windows" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="139">
+        <state state="open" reason="syn-ack" reason_ttl="127"/>
+        <service name="netbios-ssn" product="Microsoft Windows netbios-ssn" ostype="Windows" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="445">
+        <state state="open" reason="syn-ack" reason_ttl="127"/>
+        <service name="microsoft-ds" method="table" conf="3"/>
+      </port>
+    </ports>
+    <os>
+      <portused state="open" proto="tcp" portid="135"/>
+      <osmatch name="Microsoft Windows Server 2016" accuracy="98" line="78132">
+        <osclass type="general purpose" vendor="Microsoft" osfamily="Windows" osgen="2016" accuracy="98"/>
+      </osmatch>
+    </os>
+    <hostscript>
+      <script id="smb-security-mode" output="&#xa;  account_used: guest&#xa;  authentication_level: user&#xa;  challenge_response: supported&#xa;  message_signing: disabled (dangerous, but default)"/>
+    </hostscript>
+  </host>
+  <host starttime="1793700003" endtime="1793700270">
+    <status state="up" reason="arp-response" reason_ttl="0"/>
+    <address addr="172.16.30.14" addrtype="ipv4"/>
+    <hostnames/>
+    <ports>
+      <port protocol="udp" portid="123">
+        <state state="open|filtered" reason="no-response" reason_ttl="0"/>
+        <service name="ntp" method="table" conf="3"/>
+      </port>
+      <port protocol="udp" portid="161">
+        <state state="open" reason="udp-response" reason_ttl="64"/>
+        <service name="snmp" product="net-snmp" version="SNMPv3 server" method="probed" conf="10"/>
+        <script id="snmp-info" output="&#xa;  enterprise: net-snmp&#xa;  engineIDFormat: unknown&#xa;  snmpEngineBoots: 4&#xa;  snmpEngineTime: 12d03h"/>
+      </port>
+    </ports>
+  </host>
+  <host starttime="1793700003" endtime="1793700277">
+    <status state="down" reason="no-response" reason_ttl="0"/>
+    <address addr="172.16.30.9" addrtype="ipv4"/>
+  </host>
+  <runstats>
+    <finished time="1793700277" timestr="Tue Nov  3 10:04:37 2026" summary="Nmap done; 16 IP addresses (3 hosts up) scanned in 277.00 seconds" elapsed="277.00" exit="success"/>
+    <hosts up="3" down="13" total="16"/>
+  </runstats>
+</nmaprun>

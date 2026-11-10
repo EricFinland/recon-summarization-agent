@@ -1,5 +1,7 @@
 # Runtime dependencies for the recon summarization agent.
-# Add the LLM client library here once the team picks a provider.
 pydantic>=2.7
 python-dotenv>=1.0
 jsonschema>=4.21
+defusedxml>=0.7          # safe parsing of Nmap XML scan files
+langgraph>=1.0           # orchestration node for the multi-agent graph
+google-genai>=1.0        # Gemini client (only used when LLM_PROVIDER=gemini)

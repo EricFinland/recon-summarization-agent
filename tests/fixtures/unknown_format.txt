@@ -1,0 +1,5 @@
+Starting Nmap 7.94 ( synthetic fixture, plain-text output is not supported )
+Nmap scan report for app01.lab.local (10.0.0.1)
+Host is up (0.00042s latency).
+PORT   STATE SERVICE
+22/tcp open  ssh

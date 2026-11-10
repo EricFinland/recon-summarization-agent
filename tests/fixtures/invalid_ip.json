@@ -1,0 +1,6 @@
+{
+  "scan_id": "fixture-invalid-ip",
+  "hosts": [
+    { "ip": "10.0.0.300", "status": "up", "ports": [], "notes": [] }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "scan_id": "fixture-duplicate-keys",
+  "hosts": [],
+  "hosts": [
+    { "ip": "10.0.0.1", "status": "up" }
+  ]
+}

@@ -7,6 +7,18 @@ name = "recon-agent"
 version = "0.1.0"
 description = "Reconnaissance summarization agent for synthetic scan results."
 requires-python = ">=3.11"
+# Keep in sync with requirements.txt.
+dependencies = [
+  "pydantic>=2.7",
+  "python-dotenv>=1.0",
+  "jsonschema>=4.21",
+  "defusedxml>=0.7",
+  "langgraph>=1.0",
+  "google-genai>=1.0",
+]
+
+[project.scripts]
+recon-agent = "recon_agent.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -14,6 +26,10 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+filterwarnings = [
+  # langsmith (pulled in by langgraph) calls asyncio.iscoroutinefunction, deprecated in Python 3.14.
+  "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning:langsmith",
+]
 
 [tool.ruff]
 line-length = 100

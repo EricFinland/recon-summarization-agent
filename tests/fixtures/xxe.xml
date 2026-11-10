@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun [
+  <!ENTITY xxe SYSTEM "file:///etc/passwd">
+]>
+<nmaprun scanner="nmap" start="1793700000">
+  <host>
+    <status state="up"/>
+    <address addr="10.0.0.1" addrtype="ipv4"/>
+    <hostnames><hostname name="app01.lab.local"/></hostnames>
+    <comment>&xxe;</comment>
+  </host>
+</nmaprun>

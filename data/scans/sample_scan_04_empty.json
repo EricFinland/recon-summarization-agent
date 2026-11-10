@@ -1,0 +1,9 @@
+{
+  "scan_id": "synthetic-004",
+  "scanner": "synthetic-generator",
+  "scan_type": "tcp_connect",
+  "started_at": "2026-11-04T16:00:00Z",
+  "finished_at": "2026-11-04T16:02:05Z",
+  "target_range": "10.10.40.0/28",
+  "hosts": []
+}

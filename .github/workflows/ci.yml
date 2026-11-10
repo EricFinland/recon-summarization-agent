@@ -5,14 +5,25 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    env:
+      # Tests never call an LLM; make sure nothing in the runner turns one on.
+      LLM_PROVIDER: none
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: requirements*.txt
       - run: pip install -r requirements-dev.txt
@@ -20,13 +31,31 @@ jobs:
       - run: ruff format --check .
       - run: pytest
 
-  docker-build:
+  docker:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t recon-agent .
-      - name: Smoke test container (expects "not implemented" until the agent is built)
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet
+      - name: Build image
+        run: docker build -t recon-agent .
+      - name: Run default command with no network (expects exit 0)
         run: |
-          docker run --rm recon-agent > run.log 2>&1 || true
-          cat run.log
-          grep -q "not implemented" run.log
+          mkdir -p ci-output
+          chmod 777 ci-output
+          docker run --rm --network none -v "$PWD/ci-output:/app/output" recon-agent
+      - name: Check the summary exists and matches the schema
+        run: |
+          test -s ci-output/sample_scan_01.summary.json
+          test -s ci-output/audit.log.jsonl
+          docker run --rm --network none \
+            -v "$PWD/ci-output:/app/output:ro" \
+            --entrypoint python recon-agent -c "
+          import json
+          from jsonschema import Draft202012Validator
+          schema = json.load(open('schemas/recon_summary.schema.json'))
+          summary = json.load(open('output/sample_scan_01.summary.json'))
+          Draft202012Validator(schema).validate(summary)
+          print('summary is valid:', summary['overview'])
+          "

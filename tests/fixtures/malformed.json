@@ -1,0 +1,5 @@
+{
+  "scan_id": "fixture-malformed",
+  "hosts": [
+    { "ip": "10.0.0.1", "status": "up", }
+  ]
