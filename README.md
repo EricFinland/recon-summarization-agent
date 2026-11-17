@@ -1,146 +1,89 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="Recon Summarization Agent" width="100%">
+  <img src="assets/banner.svg" alt="Recon Summarization Agent: a detailed eye drawn in warm amber source-code characters" width="100%">
 </p>
 
 <p align="center">
   <a href="https://github.com/EricFinland/recon-summarization-agent/actions/workflows/ci.yml"><img src="https://github.com/EricFinland/recon-summarization-agent/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white" alt="Python 3.11 | 3.12">
-  <img src="https://img.shields.io/badge/LangGraph-node-1C3C3C?logo=langchain&logoColor=white" alt="LangGraph node">
-  <img src="https://img.shields.io/badge/pydantic-v2-E92063?logo=pydantic&logoColor=white" alt="Pydantic v2">
-  <img src="https://img.shields.io/badge/docker-non--root%20%C2%B7%20no%20network-2496ED?logo=docker&logoColor=white" alt="Docker: non-root, no network">
-  <img src="https://img.shields.io/badge/LLM-optional%20%C2%B7%20Gemini%20%7C%20Ollama-8E75B2?logo=googlegemini&logoColor=white" alt="LLM optional: Gemini or Ollama">
-  <img src="https://img.shields.io/badge/data-100%25%20synthetic-2ea44f" alt="Data: 100% synthetic">
-  <img src="https://img.shields.io/badge/tested%20with-pytest-0A9EDC?logo=pytest&logoColor=white" alt="Tested with pytest">
+  <img src="https://img.shields.io/badge/python-3.11%20%7C%203.12-ffd65c?style=flat-square&labelColor=07060c" alt="Python 3.11 | 3.12">
+  <img src="https://img.shields.io/badge/llm-optional-3fe3c3?style=flat-square&labelColor=07060c" alt="LLM optional">
+  <img src="https://img.shields.io/badge/data-synthetic%20only-b24cff?style=flat-square&labelColor=07060c" alt="Synthetic data only">
 </p>
 
 <p align="center">
-  <b>Turns a raw scan file into a structured, verified summary that the next agent can trust.</b><br>
+  Turns a raw scan file into a structured, verified summary the next agent can trust.<br>
   Every host, port, and observation traces back to the input. Nothing is invented.
 </p>
 
 <p align="center">
-  <a href="#-quick-start">Quick start</a> ·
-  <a href="#-how-it-works">How it works</a> ·
-  <a href="#-see-it-in-action">Example</a> ·
-  <a href="#-security-by-design">Security</a> ·
-  <a href="#-output-contract-for-group-2">Output contract</a> ·
-  <a href="#-documentation">Docs</a>
+  <a href="#quick-start">Quick start</a> .
+  <a href="#how-it-works">How it works</a> .
+  <a href="#example">Example</a> .
+  <a href="#security">Security</a> .
+  <a href="#output-contract-for-group-2">Output contract</a> .
+  <a href="#documentation">Docs</a>
 </p>
 
 ---
 
-## ✨ Highlights
+## What it does
 
-<table>
-  <tr>
-    <td width="33%" valign="top">
-      <h3>🎯 Grounded</h3>
-      Hosts, ports, services, and notes are copied deterministically. Every
-      observation carries an <code>evidence</code> path like
-      <code>hosts[0].notes[1]</code>, and a validator rejects anything the scan
-      does not support, including made-up CVE ids.
-    </td>
-    <td width="33%" valign="top">
-      <h3>🛡️ Injection-resistant</h3>
-      Scan banners are attacker-controlled text. Notes that read like
-      instructions to an AI are withheld and flagged, and the optional LLM
-      never sees note text at all.
-    </td>
-    <td width="33%" valign="top">
-      <h3>🧾 Auditable</h3>
-      Every run appends one timestamped JSON line with the input hash,
-      outcome, warnings, and whether an LLM was used. Failed runs are logged
-      too. Nothing is written unless validation passes.
-    </td>
-  </tr>
-  <tr>
-    <td width="33%" valign="top">
-      <h3>🔌 Plugs into LangGraph</h3>
-      <code>recon_node</code> drops into the team orchestrator and hands
-      <code>state["recon_summary"]</code> straight to the classification
-      agent.
-    </td>
-    <td width="33%" valign="top">
-      <h3>🧠 LLM optional</h3>
-      Works with no model and no API key. Turn on Gemini Flash or a local
-      Ollama model for a friendlier overview, with a grounding check and
-      automatic fallback.
-    </td>
-    <td width="33%" valign="top">
-      <h3>📦 Least privilege</h3>
-      Reads one local file. The container runs as a non-root user with a
-      read-only filesystem, dropped capabilities, and no network by default.
-    </td>
-  </tr>
-</table>
+| | |
+|---|---|
+| **Grounded** | Hosts, ports, services, and notes are copied, never generated. Every observation carries an `evidence` path like `hosts[0].notes[1]`, and a validator rejects anything the scan does not support, including made-up CVE ids. |
+| **Injection-resistant** | Scan banners are attacker-controlled text. Notes that read like instructions to an AI are withheld and flagged, and the optional LLM never sees note text at all. |
+| **Auditable** | Every run, including failed ones, appends one JSON line with the input hash, outcome, warnings, and whether an LLM was used. Nothing is written unless validation passes. |
+| **Plugs into LangGraph** | `recon_node` drops into the team orchestrator and hands `state["recon_summary"]` to the classification agent. |
+| **LLM optional** | Works with no model and no API key. Gemini Flash or a local Ollama model can write a friendlier overview, behind a grounding check with automatic fallback. |
+| **Least privilege** | Reads one local file. The container runs as a non-root user with a read-only filesystem, dropped capabilities, and no network by default. |
 
-## 🗺️ Where it fits
+## Where it fits
+
+<p align="center">
+  <img src="assets/flow.svg" alt="Agent 1 of 4: recon summarization hands recon_summary to classification, then a human approval gate, then risk prioritization and reporting" width="100%">
+</p>
 
 Agent 1 of 4 in the team's AI-assisted penetration testing proof of concept.
-It is decision support only: it never scans, never touches a target, and never
+Recon hands off directly to classification (Group 2). The mandatory human
+approval gate sits between classification and risk prioritization. This agent
+is decision support only: it never scans, never touches a target, and never
 rates risk.
 
-```mermaid
-flowchart LR
-    scan[("Synthetic scan<br/>JSON or Nmap XML")]
-    recon["<b>1. Recon summarization</b><br/>this repo"]
-    classify["2. Vulnerability classification<br/>and CVSS (Group 2)"]
-    gate{{"Human approval<br/>gate"}}
-    risk["3. Risk prioritization"]
-    report["4. Reporting<br/>draft for human sign-off"]
+## How it works
 
-    scan --> recon -->|"recon_summary"| classify --> gate --> risk --> report
-
-    classDef ours fill:#0b3d2e,stroke:#2ee6a6,stroke-width:3px,color:#eafff6
-    classDef human fill:#3d2a0b,stroke:#f5b942,stroke-width:2px,color:#fff4dc
-    class recon ours
-    class gate human
-```
-
-Recon hands off directly to classification. The mandatory human approval gate
-sits between classification and risk prioritization.
-
-## 🧩 How it works
-
-```mermaid
-flowchart TD
-    A[/"Scan file"/] --> B["<b>Load</b><br/>size limit, strict JSON, defusedxml for XML"]
-    B --> C["<b>Sanitize</b><br/>strip invisible characters, screen notes for injection"]
-    C --> D["<b>Summarize</b><br/>deterministic copy with evidence paths"]
-    D --> E{"LLM narrator<br/>configured?"}
-    E -- "no" --> T["Template overview"]
-    E -- "yes" --> N["Narrator writes an<br/>aggregate overview"]
-    N --> G{"Grounded in<br/>the scan?"}
-    G -- "no" --> T
-    G -- "yes" --> U["Narrator overview"]
-    T --> V{"<b>Validate</b><br/>schema and one-to-one<br/>check against the input"}
-    U --> V
-    V -- "pass" --> O[["output/scan.summary.json"]]
-    V -- "fail" --> X["Exit 3<br/>nothing written"]
-    O --> L[("audit.log.jsonl")]
-    X --> L
-
-    classDef ok fill:#0b3d2e,stroke:#2ee6a6,color:#eafff6
-    classDef bad fill:#3d0b14,stroke:#f2546b,color:#ffe3e8
-    class O ok
-    class X bad
-```
+<p align="center">
+  <img src="assets/pipeline.svg" alt="Pipeline: load, sanitize, summarize, optional narrate, validate, write. An injected note is withheld at sanitize; validation failure exits with code 3 and writes nothing." width="100%">
+</p>
 
 | Stage | Module | What it guarantees |
 |---|---|---|
 | Load | [`loader.py`](src/recon_agent/loader.py) | Rejects oversized, malformed, or hostile files (XXE, billion laughs, duplicate keys) with a clear error |
 | Sanitize | [`sanitizer.py`](src/recon_agent/sanitizer.py) | No hidden characters survive; instruction-like notes are flagged |
 | Summarize | [`summarizer.py`](src/recon_agent/summarizer.py) | Facts are copied, never generated; nothing is dropped or merged |
-| Narrate | [`llm.py`](src/recon_agent/llm.py) | The model sees only aggregate counts, never IPs, hostnames, or notes |
+| Narrate | [`llm.py`](src/recon_agent/llm.py) | Optional. The model sees only aggregate counts, never IPs, hostnames, or notes |
 | Validate | [`validator.py`](src/recon_agent/validator.py) | The output matches the schema and the input, fact for fact |
 | Write and log | [`output.py`](src/recon_agent/output.py), [`audit.py`](src/recon_agent/audit.py) | Atomic file write; append-only audit trail |
 
-## 🔍 See it in action
+### Keeping the optional LLM honest
+
+1. The narrator gets aggregate facts only (counts and service names), never IPs, hostnames, or notes.
+2. Every fact is screened for injection again before the call, which has a timeout and no retries.
+3. The text that comes back is checked against the scan. If it names a host, states a wrong count, invents a name, mentions a CVE, or uses a risk word, it is rejected and the template overview is kept.
+
+The checker was tuned against real model output. In a live run a local model
+claimed two hosts were "up with unspecified ports" (one was down, the other ran
+Windows with two open ports) and renamed `microsoft-ds` to "Microsoft-DNS".
+Both are now rejected automatically, with regression tests.
+
+## Example
+
+Input `data/scans/sample_scan_01.json` on the left, output
+`output/sample_scan_01.summary.json` on the right (trimmed). The full expected
+output is in [`schemas/examples/`](schemas/examples/sample_scan_01.summary.json).
 
 <table>
   <tr>
-    <th width="50%">📥 Scan in (<code>data/scans/sample_scan_01.json</code>)</th>
-    <th width="50%">📤 Summary out (<code>output/sample_scan_01.summary.json</code>)</th>
+    <th width="50%">Scan in</th>
+    <th width="50%">Summary out</th>
   </tr>
   <tr>
     <td valign="top">
@@ -201,9 +144,10 @@ flowchart TD
   </tr>
 </table>
 
-<sub>Trimmed for readability. Open ports and the rest are split out, every note keeps a pointer to its source, and no field is guessed.</sub>
+Open ports and the rest are split out, every note keeps a pointer to its
+source, and no field is guessed.
 
-### 🧨 A prompt injection, neutralized
+### A prompt injection, neutralized
 
 `sample_scan_02.json` plants text in an FTP banner aimed at any AI that reads
 the scan:
@@ -220,34 +164,7 @@ The agent publishes this instead, so the payload never reaches Group 2's model:
 }
 ```
 
-### 🧠 How the optional LLM is kept honest
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant P as Pipeline
-    participant F as Facts builder
-    participant M as LLM (Gemini or Ollama)
-    participant V as Grounding check
-    P->>F: verified summary
-    F-->>P: aggregate facts only (no IPs, hostnames, or notes)
-    P->>P: screen every fact for injection
-    P->>M: facts and strict prompt (timeout, no retries)
-    M-->>P: overview text
-    P->>V: check the text against the scan
-    alt grounded
-        V-->>P: accept the narrator text
-    else names a host, wrong count, unknown name, CVE, or risk word
-        V-->>P: reject and keep the template text
-    end
-```
-
-The checker was tuned against real model output. In a live run a local model
-claimed two hosts were "up with unspecified ports" (one was down, the other ran
-Windows with two open ports) and renamed `microsoft-ds` to "Microsoft-DNS".
-Both are now rejected automatically, with regression tests.
-
-## 🚀 Quick start
+## Quick start
 
 <details open>
 <summary><b>Local (Python 3.11+)</b></summary>
@@ -296,7 +213,7 @@ Inside the team orchestrator, add `recon_node` as a node and read
 The full teammate guide (Windows and macOS/Linux, every LLM provider, adding
 new scans, troubleshooting) is in [docs/SETUP.md](docs/SETUP.md).
 
-## 💻 CLI
+## CLI
 
 ```text
 python -m recon_agent [--input FILE] [--output-dir DIR] [--llm {none,gemini,ollama}] [--stdout]
@@ -316,8 +233,9 @@ python -m recon_agent [--input FILE] [--output-dir DIR] [--llm {none,gemini,olla
 | `3` | Summary failed validation, nothing written |
 | `4` | Configuration error |
 
-<details>
-<summary><b>Configuration (environment or <code>.env</code>)</b></summary>
+### Configuration
+
+Set in the environment or in `.env`. Real environment variables win.
 
 | Variable | Default | Meaning |
 |---|---|---|
@@ -335,22 +253,20 @@ The planned model is a Gemini Flash model. All data is synthetic, so a hosted
 model is allowed; `none` stays the default so the agent runs without a key and
 in CI.
 
-</details>
-
-## 🔐 Security by design
+## Security
 
 | Control | How it is enforced |
 |---|---|
-| 🧹 **Input validation** | Size cap before reading, strict typing (`"22"` is not a port), duplicate JSON keys rejected, defusedxml blocks XXE and entity expansion, 512-character field limit |
-| 🕵️ **Prompt-injection defense** | Heuristic screen withholds instruction-like notes; the LLM only ever receives aggregate counts; facts are screened again before any call |
-| ✅ **Output verification** | JSON Schema plus a one-to-one check against the input; CVE ids only if present in the scan; LLM text must not name hosts, misstate counts, or invent names |
-| 🔒 **Least privilege** | Reads one local file; only credential is the optional LLM key; container is non-root, read-only, capability-free, and offline by default |
-| 🧾 **Audit trail** | Append-only JSON Lines with input SHA-256, outcome, problems, warnings, and narrator use |
-| ⏱️ **Timeouts** | Every LLM request has a timeout and no retries; a failed model call falls back to the template |
+| Input validation | Size cap before reading, strict typing (`"22"` is not a port), duplicate JSON keys rejected, defusedxml blocks XXE and entity expansion, 512-character field limit |
+| Prompt-injection defense | Heuristic screen withholds instruction-like notes; the LLM only ever receives aggregate counts; facts are screened again before any call |
+| Output verification | JSON Schema plus a one-to-one check against the input; CVE ids only if present in the scan; LLM text must not name hosts, misstate counts, or invent names |
+| Least privilege | Reads one local file; only credential is the optional LLM key; container is non-root, read-only, capability-free, and offline by default |
+| Audit trail | Append-only JSON Lines with input SHA-256, outcome, problems, warnings, and narrator use |
+| Timeouts | Every LLM request has a timeout and no retries; a failed model call falls back to the template |
 
 Mapped to the contract's controls in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#security-controls).
 
-## 📐 Output contract (for Group 2)
+## Output contract (for Group 2)
 
 One JSON document per scan, validated against
 [`schemas/recon_summary.schema.json`](schemas/recon_summary.schema.json)
@@ -373,7 +289,7 @@ appears unless the scan contains it, and there are no severity or risk fields
 [docs/OUTPUT_FORMAT.md](docs/OUTPUT_FORMAT.md), with worked examples in
 [`schemas/examples/`](schemas/examples/).
 
-## 🧪 Testing
+## Testing
 
 | Suite | Covers |
 |---|---|
@@ -393,7 +309,7 @@ pytest            # about 5 seconds, never touches the network
 ruff check . && ruff format --check .
 ```
 
-## 🗂️ Sample data
+## Sample data
 
 All data is synthetic, generated for this project, and cataloged in
 [data/CATALOG.md](data/CATALOG.md) (origin, generation method, privacy check,
@@ -407,7 +323,7 @@ justification).
 | `sample_scan_04_empty.json` | JSON | A valid scan with zero hosts |
 
 <details>
-<summary><b>🧱 Repository layout</b></summary>
+<summary><b>Repository layout</b></summary>
 
 ```text
 .
@@ -430,14 +346,14 @@ justification).
 ├── data/scans/          synthetic inputs (see data/CATALOG.md)
 ├── tests/               unit, golden, contract, tamper, CLI, graph
 ├── docs/                setup, architecture, output format, tasks
-├── assets/              README artwork
+├── assets/              README artwork; assets/art/*.py regenerates it
 ├── Dockerfile, docker-compose.yml
 └── .github/             CI workflow and PR template
 ```
 
 </details>
 
-## 📚 Documentation
+## Documentation
 
 | Doc | For |
 |---|---|

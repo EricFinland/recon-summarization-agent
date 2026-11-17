@@ -37,3 +37,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# README artwork generators build long SVG markup strings.
+"assets/art/*.py" = ["E501"]
