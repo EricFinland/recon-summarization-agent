@@ -25,6 +25,7 @@ text{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono
 @keyframes w13{0.00%{opacity:0}68.80%{opacity:0}70.00%{opacity:1}98.50%{opacity:1}99.70%{opacity:0}100.00%{opacity:0}}
 @keyframes tok{0%{transform:translateX(128.2px)}2.00%{transform:translateX(128.2px)}12.00%{transform:translateX(128.2px)}17.00%{transform:translateX(332.9px)}33.00%{transform:translateX(332.9px)}38.00%{transform:translateX(537.6px)}47.00%{transform:translateX(537.6px)}52.00%{transform:translateX(742.4px)}60.00%{transform:translateX(742.4px)}65.00%{transform:translateX(947.1px)}76.00%{transform:translateX(947.1px)}81.00%{transform:translateX(1151.8px)}96.00%{transform:translateX(1151.8px)}100%{transform:translateX(1151.8px)}}
 @keyframes tokfade{0.00%{opacity:1}2.00%{opacity:1}96.00%{opacity:1}98.00%{opacity:0}100.00%{opacity:0}}
+@keyframes typing{0%,86%{transform:translateX(0)}93%,99.5%{transform:translateX(1210px)}100%{transform:translateX(0)}}
 @keyframes w14{0.00%{opacity:0}0.80%{opacity:0}2.00%{opacity:1}12.00%{opacity:1}13.20%{opacity:0}100.00%{opacity:0}}
 @keyframes w15{0.00%{opacity:0}15.80%{opacity:0}17.00%{opacity:1}33.00%{opacity:1}34.20%{opacity:0}100.00%{opacity:0}}
 @keyframes w16{0.00%{opacity:0}36.80%{opacity:0}38.00%{opacity:1}47.00%{opacity:1}48.20%{opacity:0}100.00%{opacity:0}}
@@ -54,13 +55,9 @@ text{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono
     <stop offset="0" stop-color="#ffc562" stop-opacity=".45"/>
     <stop offset="1" stop-color="#ffc562" stop-opacity="0"/>
   </radialGradient>
-  <clipPath id="filled"><rect x="36" y="235.0" height="30" width="0">
-  <animate attributeName="width" values="92.2;92.2;92.2;296.9;296.9;501.6;501.6;706.4;706.4;911.1;911.1;1115.8;1115.8;1115.8" keyTimes="0.0000;0.0200;0.1200;0.1700;0.3300;0.3800;0.4700;0.5200;0.6000;0.6500;0.7600;0.8100;0.9600;1.0000" calcMode="spline" keySplines=".6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1" dur="14s" repeatCount="indefinite"/>
-</rect></clipPath>
+  <clipPath id="filled"><rect x="-2400" y="235.0" height="30" width="2400" style="animation:tok 14s cubic-bezier(.6,0,.4,1) infinite"/></clipPath>
   <clipPath id="typing">
-    <rect x="36" y="531.0" height="22" width="0">
-      <animate attributeName="width" values="0;0;1210;1210;0" keyTimes="0;.86;.93;.995;1" dur="14s" repeatCount="indefinite"/>
-    </rect>
+    <rect x="-1174" y="531.0" height="22" width="1210" style="animation:typing 14s linear infinite"/>
   </clipPath>
 </defs>
 <g font-size="12" fill="#8c7a64" letter-spacing="2.5">

@@ -39,7 +39,7 @@ text{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono
     <stop offset="0" stop-color="#ffc562" stop-opacity=".45"/>
     <stop offset="1" stop-color="#ffc562" stop-opacity="0"/>
   </radialGradient>
-  <clipPath id="filled"><rect x="36" y="213.0" height="30" width="0"><animate attributeName="width" values="75.4;75.4;75.4;284.4;284.4;501.7;501.7;704.3;704.3;906.8;906.8;1124.2;1124.2;1124.2" keyTimes="0.0000;0.0200;0.0800;0.1400;0.2400;0.3000;0.3800;0.4400;0.6600;0.7200;0.8000;0.8600;0.9600;1.0000" calcMode="spline" keySplines=".6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1;.6 0 .4 1" dur="12s" repeatCount="indefinite"/></rect></clipPath>
+  <clipPath id="filled"><rect x="-2400" y="213.0" height="30" width="2400" style="animation:tok 12s cubic-bezier(.6,0,.4,1) infinite"/></clipPath>
 </defs>
 <g font-size="12" fill="#8c7a64" letter-spacing="2.5">
   <text x="40" y="44">WHERE IT FITS</text>

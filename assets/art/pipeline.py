@@ -165,13 +165,20 @@ css.append(
     f"@keyframes tok{{0%{{transform:translateX({center(0):.1f}px)}}{moves}100%{{transform:translateX({center(5):.1f}px)}}}}"
 )
 css.append(show_window("tokfade", 0.02, 0.96, 0.02))
+css.append(
+    "@keyframes typing{0%,86%{transform:translateX(0)}93%,99.5%{transform:translateX(1210px)}"
+    "100%{transform:translateX(0)}}"
+)
 pts = [(0.0, center(0))] + kf + [(1.0, center(5))]
 key_times = ";".join(f"{p:.4f}" for p, _ in pts)
 widths = ";".join(f"{x - 36:.1f}" for _, x in pts)
 splines = ";".join([".6 0 .4 1"] * (len(pts) - 1))
-fill_clip = f'''<clipPath id="filled"><rect x="36" y="{RAIL - 20}" height="30" width="0">
-  <animate attributeName="width" values="{widths}" keyTimes="{key_times}" calcMode="spline" keySplines="{splines}" dur="{T}s" repeatCount="indefinite"/>
-</rect></clipPath>'''
+# The lit line is revealed by a clip rectangle that rides the same CSS animation
+# as the token, so its edge always sits under the token (one clock, no drift).
+fill_clip = (
+    f'<clipPath id="filled"><rect x="-2400" y="{RAIL - 20}" height="30" width="2400" '
+    f'style="animation:tok {T}s cubic-bezier(.6,0,.4,1) infinite"/></clipPath>'
+)
 token = f"""
 <g style="animation:tok {T}s cubic-bezier(.6,0,.4,1) infinite">
   <g style="animation:tokfade {T}s linear infinite">
@@ -333,9 +340,7 @@ body = f"""
   </radialGradient>
   {fill_clip}
   <clipPath id="typing">
-    <rect x="36" y="{AY + 76}" height="22" width="0">
-      <animate attributeName="width" values="0;0;1210;1210;0" keyTimes="0;.86;.93;.995;1" dur="{T}s" repeatCount="indefinite"/>
-    </rect>
+    <rect x="-1174" y="{AY + 76}" height="22" width="1210" style="animation:typing {T}s linear infinite"/>
   </clipPath>
 </defs>
 <g font-size="12" fill="{DIM}" letter-spacing="2.5">
