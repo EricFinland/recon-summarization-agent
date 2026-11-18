@@ -17,33 +17,34 @@ ROOT = Path(__file__).resolve().parents[2]
 
 MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace"
 
-BG = "#080605"
-INK = "#f4e7d0"
-DIM = "#8c7a64"
-FAINT = "#33291f"
+BG = "#03101a"
+INK = "#e2f7f1"
+DIM = "#6f939a"
+FAINT = "#163440"
 
-# One warm palette for every picture: near-black, ember, amber, gold, cream.
-WARM = [
-    (0.00, "#1a0c05"),
-    (0.20, "#4a230b"),
-    (0.40, "#8f4312"),
-    (0.60, "#d6731d"),
-    (0.78, "#f4a53c"),
-    (0.90, "#ffd486"),
-    (1.00, "#fff4de"),
+# One ocean palette for every picture: deep navy, teal, seafoam, foam white.
+SEA = [
+    (0.00, "#03141d"),
+    (0.20, "#06303b"),
+    (0.40, "#0b5a62"),
+    (0.60, "#14908c"),
+    (0.78, "#3fc6b0"),
+    (0.90, "#9ee8d4"),
+    (1.00, "#f0fffa"),
 ]
-IRIS = WARM
-SUNSET = [
-    (0.00, "#fff0d2"),
-    (0.40, "#ffc562"),
-    (0.75, "#f08a24"),
-    (1.00, "#b8541a"),
+IRIS = SEA
+SUNSET = [  # title and progress gradient: foam to teal
+    (0.00, "#f0fffa"),
+    (0.40, "#9ee8d4"),
+    (0.75, "#3fc6b0"),
+    (1.00, "#14908c"),
 ]
-GOLD = "#ffc562"
-TEAL = "#e9d3a8"  # "ok" and "clean" lines: pale gold, not a new hue
-PINK = "#f08a24"  # flagged lines: amber
-LIME = "#ffd98a"
-RED = "#e2553a"  # failure only
+SAND = "#f0d49a"  # the one warm accent: highlights, the human gate
+GOLD = SAND
+TEAL = "#bdeee1"  # "ok" and "clean" lines
+PINK = SAND  # flagged lines
+LIME = "#c8f5e8"
+RED = "#ff6f61"  # failure only (coral)
 
 
 # --------------------------------------------------------------------------

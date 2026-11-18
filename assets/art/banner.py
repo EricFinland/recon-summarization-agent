@@ -1,16 +1,12 @@
-"""Top banner: an ASCII spider walking a web of scanned hosts.
+"""Top banner: ASCII sea turtles drifting past, next to the project name.
 
 Run from the repo root:  python assets/art/banner.py
 Writes assets/banner.svg.
 
-The web's nodes are the hosts in data/scans/sample_scan_01.json. The spider
-walks the strands from host to host and stops to read each one, and the
-summary on the right gains a line per host as it goes.
-
-The spider itself comes from spider_gait.json.gz: glyph frames of one leg cycle
-(walking) and a slow idle loop, recorded from an ASCII creature engine. Every
-other part of the picture is computed here. Everything runs on CSS animations
-that share one loop, so the parts never drift apart.
+The turtle comes from turtle_swim.json.gz: glyph frames of one full flipper
+stroke, recorded from an ASCII creature engine. Each turtle on the banner reuses
+those frames (SVG <use>), at its own size, depth, speed and heading, and surges
+forward on the power stroke. Everything is CSS animation with no scripts.
 """
 
 from __future__ import annotations
@@ -18,6 +14,7 @@ from __future__ import annotations
 import gzip
 import json
 import math
+import random
 from collections import defaultdict
 from html import escape
 
@@ -27,7 +24,8 @@ from kit import (
     FAINT,
     INK,
     ROOT,
-    WARM,
+    SEA,
+    SUNSET,
     Layer,
     mix,
     num,
@@ -38,124 +36,27 @@ from kit import (
 )
 
 W, H = 1280, 520
-GOLD_RAMP = [(0.0, "#8f4312"), (0.45, "#ffc562"), (1.0, "#fff4de")]
+PANEL = (0, 59, 744, 415)  # x, y, w, h of the water on the left
+SKIN = [(0.0, "#0b1b1e"), (0.45, "#5f8276"), (1.0, "#f3e7c6")]
+rnd = random.Random(11)
 
-# ----------------------------------------------------------------- the web
+# ----------------------------------------------------------------- turtle frames
 
-CX, CY, SX = 380, 262, 2.0
-RINGS = [24, 50, 76, 102, 128]
-SPOKES = 12
-SPEED = 95  # px/s along the strands
-PAUSE = 1.15  # s spent reading each host
-STEP = 1 / 15  # keyframe spacing for the walk, in seconds
-
-# hosts from sample_scan_01, in the order the spider visits them
-HOSTS = [
-    ((210, 3), "10.10.20.5", "up", "ssh http https"),
-    ((300, 3), "10.10.20.12", "up", "mysql"),
-    ((0, 3), "10.10.20.30", "up", "microsoft-ds ms-wbt-server"),
-    ((90, 3), "10.10.20.44", "up", "no open ports"),
-    ((150, 2), "10.10.20.99", "down", ""),
-]
-
-
-def spoke_pt(deg: float, r: float) -> tuple[float, float]:
-    a = math.radians(deg)
-    return CX + SX * r * math.cos(a), CY + r * math.sin(a)
-
-
-def ring_pt(deg: float, r: float) -> tuple[float, float]:
-    """A point on a ring, where rings are straight chords between spokes."""
-    step = 360 / SPOKES
-    k = math.floor(deg / step)
-    f = deg / step - k
-    a, b = spoke_pt(k * step, r), spoke_pt((k + 1) * step, r)
-    return a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f
-
-
-def leg_points(a1: float, i1: int, a2: float, i2: int) -> list[tuple[float, float]]:
-    """Walk along strands: out or in along the spoke, then around the ring."""
-    r1, r2 = RINGS[i1], RINGS[i2]
-    pts = [spoke_pt(a1, r1 + (r2 - r1) * k / 30) for k in range(31)]
-    d = ((a2 - a1) % 360 + 540) % 360 - 180
-    n = max(2, math.ceil(abs(d) / 1.5))
-    pts += [ring_pt((a1 + d * k / n) % 360, r2) for k in range(1, n + 1)]
-    out = [pts[0]]
-    for p in pts[1:]:
-        if math.dist(p, out[-1]) > 0.01:
-            out.append(p)
-    return out
-
-
-legs = []
-for i, ((a1, i1), *_rest) in enumerate(HOSTS):
-    (a2, i2), *_ = HOSTS[(i + 1) % len(HOSTS)]
-    pts = leg_points(a1, i1, a2, i2)
-    cum = [0.0]
-    for p, q in zip(pts, pts[1:], strict=False):
-        cum.append(cum[-1] + math.dist(p, q))
-    legs.append({"pts": pts, "cum": cum, "len": cum[-1], "walk": cum[-1] / SPEED * 1.35})
-
-T = sum(PAUSE + lg["walk"] for lg in legs)
-T = round(T / STEP) * STEP
-scale_t = T / sum(PAUSE + lg["walk"] for lg in legs)
-t0 = 0.0
-for lg in legs:
-    lg["pause"] = PAUSE * scale_t
-    lg["walk"] *= scale_t
-    lg["t0"] = t0
-    t0 += lg["pause"] + lg["walk"]
-
-
-def pos_at(tau: float) -> tuple[tuple[float, float], bool]:
-    tau %= T
-    for lg in legs:
-        if tau < lg["t0"] + lg["pause"] + lg["walk"]:
-            u = tau - lg["t0"]
-            if u < lg["pause"]:
-                return lg["pts"][0], False
-            f = (u - lg["pause"]) / lg["walk"]
-            target = (0.5 - 0.5 * math.cos(math.pi * f)) * lg["len"]
-            j = 1
-            while j < len(lg["cum"]) - 1 and lg["cum"][j] < target:
-                j += 1
-            a, b = lg["pts"][j - 1], lg["pts"][j]
-            la, lb = lg["cum"][j - 1], lg["cum"][j]
-            w = (target - la) / (lb - la) if lb > la else 0
-            return (a[0] + (b[0] - a[0]) * w, a[1] + (b[1] - a[1]) * w), True
-    return legs[0]["pts"][0], False
-
-
-# heading: follows the direction of travel, smoothed; two passes so the loop closes
-n_frames = round(T / STEP)
-fine = 8
-heading = 0.0
-track = []
-for _pass in range(2):
-    track = []
-    for k in range(n_frames * fine):
-        t = k * STEP / fine
-        (ax, ay), _ = pos_at(t)
-        (bx, by), _ = pos_at(t + STEP / fine)
-        if math.hypot(bx - ax, by - ay) > 0.05:
-            want = math.atan2(by - ay, bx - ax)
-            d = (want - heading + math.pi) % (2 * math.pi) - math.pi
-            heading += d * min(1.0, STEP / fine * 7)
-        track.append((t, ax, ay, heading))
-
-# ----------------------------------------------------------------- spider frames
-
-gait = json.loads(gzip.decompress((ROOT / "assets/art/spider_gait.json.gz").read_bytes()))
-GC = gait["C"]
+swim = json.loads(gzip.decompress((ROOT / "assets/art/turtle_swim.json.gz").read_bytes()))
+GC = swim["C"]
+FRAMES = swim["frames"]
+NF = len(FRAMES)
 GLYPH_SIZE = 6.7
-accent = {gait["pal"]["crim"], gait["pal"]["vio"]}
+PAL = swim["pal"]
 
 
 def glyph_color(p: int, lvl: int, a: float) -> str:
-    if p in accent:
-        c = ramp(GOLD_RAMP, lvl / 6)
+    if p == PAL["shell"]:
+        c = ramp(SEA, 0.18 + 0.82 * lvl / 6)
+    elif p == PAL["eye"]:
+        c = "#f0fffa" if lvl >= 5 else "#04121a"
     else:
-        c = ramp(WARM, 0.22 + 0.78 * lvl / 6)
+        c = ramp(SKIN, 0.12 + 0.88 * lvl / 6)
     return mix(BG, c, max(0.0, min(1.0, a)))
 
 
@@ -175,176 +76,118 @@ def frame_svg(records: list) -> str:
     return "".join(out)
 
 
-def flipbook(frames: list, period: float, name: str) -> tuple[str, str]:
-    n = len(frames)
-    css = (
-        f"@keyframes {name}{{0%{{visibility:visible}}{100 / n:.3f}%,100%{{visibility:hidden}}}}"
-        f".{name}{{visibility:hidden;animation:{name} {period:.3f}s step-end infinite}}"
-    )
-    parts = []
-    for k, fr in enumerate(frames):
-        delay = -((n - k) % n) * period / n
-        parts.append(f'<g class="{name}" style="animation-delay:{delay:.3f}s">{frame_svg(fr)}</g>')
-    return "".join(parts), css
+frame_defs = "".join(f'<g id="t{k}">{frame_svg(fr)}</g>' for k, fr in enumerate(FRAMES))
 
+# ----------------------------------------------------------------- the turtles
 
-walk_svg, walk_css = flipbook(gait["walk"], 0.62, "gw")
-idle_svg, idle_css = flipbook(gait["idle"], gait["idleT"], "gi")
-
-# ----------------------------------------------------------------- timing helpers
-
-css: list[str] = [walk_css, idle_css]
-_n = 0
-
-
-def windows(spans: list[tuple[float, float]], prop: str = "visibility") -> str:
-    """Keyframes (fractions of T) where an element is shown; returns a class name."""
-    global _n
-    _n += 1
-    on, off = ("visible", "hidden") if prop == "visibility" else ("1", "0")
-    pts = {0.0: off}
-    for a, b in spans:
-        pts[max(0.0, a)] = on
-        if b < 1:
-            pts[b] = off
-    if spans and spans[0][0] <= 0:
-        pts[0.0] = on
-    frames = "".join(f"{p * 100:.3f}%{{{prop}:{v}}}" for p, v in sorted(pts.items()))
-    name = f"k{_n}"
-    css.append(
-        f"@keyframes {name}{{{frames}}}.{name}{{{prop}:{off};animation:{name} {T:.3f}s step-end infinite}}"
-    )
-    return name
-
-
-walk_spans = [
-    ((lg["t0"] + lg["pause"]) / T, (lg["t0"] + lg["pause"] + lg["walk"]) / T) for lg in legs
+css: list[str] = [
+    f"@keyframes fl{{0%{{visibility:visible}}{100 / NF:.3f}%,100%{{visibility:hidden}}}}"
 ]
-idle_spans = [(lg["t0"] / T, (lg["t0"] + lg["pause"]) / T) for lg in legs]
-walk_cls, idle_cls = windows(walk_spans), windows(idle_spans)
-
-moves = "".join(
-    f"{t / T * 100:.3f}%{{transform:translate({x:.1f}px,{y:.1f}px) rotate({math.degrees(h):.1f}deg)}}"
-    for t, x, y, h in track[::fine]
-)
-t_end, x_end, y_end, h_end = track[0]
-moves += f"100%{{transform:translate({x_end:.1f}px,{y_end:.1f}px) rotate({math.degrees(heading):.1f}deg)}}"
-css.append(f"@keyframes crawl{{{moves}}}.crawl{{animation:crawl {T:.3f}s linear infinite}}")
-
-# ----------------------------------------------------------------- web glyphs
 
 
-def slope_char(dx: float, dy: float) -> str:
-    a = math.degrees(math.atan2(dy, dx)) % 180
-    if a < 22 or a >= 158:
-        return "-"
-    if a < 68:
-        return "\\"
-    if a < 112:
-        return "|"
-    return "/"
+def surge(row: float) -> float:
+    """Forward speed over one stroke: a push on the power stroke, a glide after."""
+    return 0.35 + 0.65 * max(0.0, math.sin(row)) ** 1.5
 
 
-def strand(
-    layer: Layer, p: tuple[float, float], q: tuple[float, float], color: str, step: float = 7.0
-) -> None:
-    n = max(1, round(math.dist(p, q) / step))
-    ch = slope_char(q[0] - p[0], q[1] - p[1])
+# (scale, opacity, stroke period s, strokes per crossing, start, end, wobble px, phase 0..1)
+TURTLES = [
+    (0.52, 0.42, 4.8, 6, (-90, 352), (840, 300), 18, 0.55),
+    (0.68, 0.62, 4.2, 5, (840, 150), (-110, 214), 24, 0.15),
+    (1.00, 1.00, 3.6, 7, (-150, 268), (900, 196), 30, 0.38),
+    (0.44, 0.36, 5.2, 5, (820, 392), (-90, 360), 12, 0.8),
+]
+
+turtle_svg = []
+for i, (sc, op, period, strokes, (x0, y0), (x1, y1), wob, phase) in enumerate(TURTLES):
+    T = period * strokes
+    # distance covered follows the stroke, so the turtle surges as its flippers push
+    n = 240
+    acc = [0.0]
+    for k in range(n):
+        acc.append(acc[-1] + surge(2 * math.pi * strokes * (k + 0.5) / n))
+    keys = []
     for k in range(n + 1):
-        f = k / n
-        layer.add(
-            round(p[0] + (q[0] - p[0]) * f, 1), round(p[1] + (q[1] - p[1]) * f + 3, 1), ch, color
+        f = acc[k] / acc[-1]
+        x = x0 + (x1 - x0) * f
+        y = y0 + (y1 - y0) * f + wob * math.sin(2 * math.pi * (k / n) * 1.5 + i)
+        keys.append((k / n, x, y))
+    frames = []
+    for k, (p, x, y) in enumerate(keys):
+        q = keys[min(k + 1, n)]
+        r = keys[max(k - 1, 0)]
+        ang = math.degrees(math.atan2(q[2] - r[2], q[1] - r[1]))
+        frames.append(
+            f"{p * 100:.2f}%{{transform:translate({x:.1f}px,{y:.1f}px) rotate({ang:.1f}deg)}}"
         )
-
-
-web = Layer()
-outer = RINGS[-1]
-for s in range(SPOKES):
-    deg = s * 360 / SPOKES
-    strand(web, spoke_pt(deg, 6), spoke_pt(deg, outer + 14), "#4a3420")
-for i, r in enumerate(RINGS):
-    col = mix("#2e2216", "#5a3d22", i / (len(RINGS) - 1))
-    for s in range(SPOKES):
-        strand(web, spoke_pt(s * 30, r), spoke_pt((s + 1) * 30, r), col)
-# anchor threads out to the edges of the panel
-for p, q in [
-    (spoke_pt(210, outer + 14), (48, 82)),
-    (spoke_pt(330, outer + 14), (712, 82)),
-    (spoke_pt(150, outer + 14), (48, 456)),
-    (spoke_pt(30, outer + 14), (712, 456)),
-]:
-    strand(web, p, q, "#3a2a1a", 8)
-
-# strands the spider has walked stay lit until the loop restarts
-walked = []
-for lg in legs:
-    lit = Layer()
-    pts = lg["pts"]
-    for p, q in zip(pts[::6], pts[6::6], strict=False):
-        strand(lit, p, q, "#b8601d")
-    strand(lit, pts[-7 if len(pts) > 7 else 0], pts[-1], "#b8601d")
-    cls = windows([((lg["t0"] + lg["pause"] + lg["walk"]) / T, 0.995)])
-    walked.append(f'<g class="{cls}">{lit.svg()}</g>')
-
-# host nodes and their small address labels
-nodes = []
-for i, ((deg, ring), ip, status, _svc) in enumerate(HOSTS):
-    x, y = spoke_pt(deg, RINGS[ring])
-    lg = legs[i]
-    seen = windows([(lg["t0"] / T, 0.995)])
-    dx, dy = math.cos(math.radians(deg)), math.sin(math.radians(deg))
-    lx, ly = x + dx * 26, y + dy * 18 + 4
-    anchor = "start" if dx > 0.3 else "end" if dx < -0.3 else "middle"
-    lit_col = "#ffd486" if status == "up" else "#a4553a"
-    nodes.append(
-        f'<text x="{num(round(x, 1))}" y="{num(round(y + 4, 1))}" font-size="12" fill="#6b4524" '
-        f'text-anchor="middle">o</text>'
-        f'<text class="{seen}" x="{num(round(x, 1))}" y="{num(round(y + 4, 1))}" font-size="13" '
-        f'font-weight="700" fill="{lit_col}" text-anchor="middle">@</text>'
-        f'<text x="{num(round(lx, 1))}" y="{num(round(ly, 1))}" font-size="10" fill="#6e5840" '
-        f'text-anchor="{anchor}" letter-spacing=".5" stroke="{BG}" stroke-width="4" '
-        f'paint-order="stroke">{ip}</text>'
+    css.append(f"@keyframes sw{i}{{{''.join(frames)}}}")
+    delay = -phase * T
+    css.append(f".sw{i}{{animation:sw{i} {T:.2f}s linear {delay:.2f}s infinite}}")
+    css.append(f".f{i}{{visibility:hidden;animation:fl {period:.2f}s step-end infinite}}")
+    uses = []
+    for k in range(NF):
+        d = -((NF - k) % NF) * period / NF + delay
+        uses.append(f'<use href="#t{k}" class="f{i}" style="animation-delay:{d:.3f}s"/>')
+    turtle_svg.append(
+        f'<g class="sw{i}" opacity="{op}"><g transform="scale({sc})">'
+        f'<ellipse cx="0" cy="0" rx="78" ry="64" fill="url(#shell-glow)"/>{"".join(uses)}</g></g>'
     )
+
+# ----------------------------------------------------------------- the water
+
+bubbles = []
+for b in range(18):
+    x = rnd.uniform(30, 710)
+    dur = rnd.uniform(7, 13)
+    delay = -rnd.uniform(0, dur)
+    size = rnd.choice([9, 10, 11, 13])
+    ch = rnd.choice(["o", "o", ".", "°", "0"])
+    sway = rnd.uniform(4, 10)
+    css.append(
+        f"@keyframes bs{b}{{0%,100%{{transform:translateX(0)}}50%{{transform:translateX({sway:.1f}px)}}}}"
+    )
+    bubbles.append(
+        f'<g style="animation:rise {dur:.2f}s linear {delay:.2f}s infinite">'
+        f'<text x="{x:.1f}" y="470" font-size="{size}" fill="#9ee8d4" '
+        f'style="animation:bs{b} {dur / 3:.2f}s ease-in-out infinite">{escape(ch)}</text></g>'
+    )
+css.append(
+    "@keyframes rise{0%{transform:translateY(0);opacity:0}12%{opacity:.55}80%{opacity:.35}"
+    "100%{transform:translateY(-420px);opacity:0}}"
+)
+
+rays = "".join(
+    f'<polygon points="{x:.0f},59 {x + w:.0f},59 {x + w - 170:.0f},474 {x - 230:.0f},474" '
+    f'fill="url(#ray)" opacity="{o}"/>'
+    for x, w, o in [(150, 60, 0.5), (330, 90, 0.7), (520, 50, 0.45), (640, 70, 0.35)]
+)
+
+drift = Layer()
+stars(drift, W, H, 240, seed=9, avoid=lambda x, y: 744 < x < 1250 and 80 < y < 470)
+drift.items = [(x, y, c, mix(BG, "#3fc6b0", 0.35), cls) for x, y, c, _, cls in drift.items]
 
 # ----------------------------------------------------------------- right side
 
-TX = 760
-title_svg = pixel_blocks(
-    "RECON", TX, 150, 15, [(0, "#fff0d2"), (0.6, "#ffc562"), (1, "#f08a24")], shadow="#3a1c0a"
-)
-
-readout = [
-    f'<text x="{TX}" y="346" font-size="12" fill="{FAINT}" letter-spacing="1.5">SUMMARY.HOSTS[]</text>'
+TX = 768
+title_svg = pixel_blocks("RECON", TX, 150, 15, SUNSET, shadow="#0b2a33")
+HOSTS = [
+    ("10.10.20.5", "up", "ssh http https"),
+    ("10.10.20.12", "up", "mysql"),
+    ("10.10.20.30", "up", "microsoft-ds ms-wbt-server"),
+    ("10.10.20.44", "up", "no open ports"),
+    ("10.10.20.99", "down", ""),
 ]
-for i, (_node, ip, status, svc) in enumerate(HOSTS):
-    lg = legs[i]
-    shown = windows([((lg["t0"] + 0.25) / T, 0.995)])
+readout = [
+    f'<text x="{TX}" y="346" font-size="12" fill="{DIM}" letter-spacing="1.5">SUMMARY.HOSTS[]</text>'
+]
+for i, (ip, status, svc) in enumerate(HOSTS):
     y = 372 + i * 19
-    col = INK if status == "up" else "#c96a45"
+    col = INK if status == "up" else "#ff6f61"
     readout.append(
-        f'<g class="{shown}" font-size="13">'
-        f'<text x="{TX}" y="{y}" fill="{col}">{ip}</text>'
+        f'<g font-size="13"><text x="{TX}" y="{y}" fill="{col}">{ip}</text>'
         f'<text x="{TX + 118}" y="{y}" fill="{DIM}">{status}</text>'
-        f'<text x="{TX + 168}" y="{y}" fill="#d9a35c">{escape(svc)}</text></g>'
+        f'<text x="{TX + 168}" y="{y}" fill="#9ee8d4">{escape(svc)}</text></g>'
     )
-reading = []
-for i, lg in enumerate(legs):
-    cur = windows([(lg["t0"] / T, (lg["t0"] + lg["pause"]) / T)])
-    y = 372 + i * 19
-    reading.append(
-        f'<text class="{cur}" x="{TX - 16}" y="{y}" font-size="13" fill="#ffc562">&gt;</text>'
-    )
-
-sky = Layer()
-stars(
-    sky,
-    W,
-    H,
-    200,
-    seed=4,
-    avoid=lambda x, y: (x > 720 and 90 < y < 470) or (60 < y < 470 and x < 720),
-)
-sky.items = [(x, y, c, mix(BG, "#8f4312", 0.55), cls) for x, y, c, _, cls in sky.items]
 
 css.append(
     ".tw1{animation:tw 4.1s ease-in-out infinite}"
@@ -352,32 +195,43 @@ css.append(
     ".tw3{animation:tw 6.7s ease-in-out -3.2s infinite}"
     "@keyframes tw{0%,100%{opacity:1}50%{opacity:.25}}"
     "@media (prefers-reduced-motion:reduce){*{animation:none!important}"
-    ".gw,.gi{visibility:hidden}.gi:first-child{visibility:visible}}"
+    ".f0,.f1,.f2,.f3{visibility:hidden}}"
 )
 
+px, py, pw, ph = PANEL
 body = f"""
 <rect width="{W}" height="{H}" fill="{BG}"/>
 <defs>
-  <radialGradient id="warmth" cx="{CX}" cy="{CY}" r="300" gradientUnits="userSpaceOnUse">
-    <stop offset="0" stop-color="#f08a24" stop-opacity=".10"/>
-    <stop offset="1" stop-color="#8f4312" stop-opacity="0"/>
+  <linearGradient id="depth" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#0a3a48" stop-opacity=".55"/>
+    <stop offset=".6" stop-color="#062634" stop-opacity=".25"/>
+    <stop offset="1" stop-color="{BG}" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="ray" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#9ee8d4" stop-opacity=".09"/>
+    <stop offset="1" stop-color="#9ee8d4" stop-opacity="0"/>
+  </linearGradient>
+  <radialGradient id="shell-glow">
+    <stop offset="0" stop-color="#3fc6b0" stop-opacity=".16"/>
+    <stop offset="1" stop-color="#3fc6b0" stop-opacity="0"/>
   </radialGradient>
-  <radialGradient id="body-glow">
-    <stop offset="0" stop-color="#f08a24" stop-opacity=".22"/>
-    <stop offset="1" stop-color="#f08a24" stop-opacity="0"/>
-  </radialGradient>
+  <linearGradient id="edges" x1="0" x2="1">
+    <stop offset="0" stop-color="#000"/>
+    <stop offset=".07" stop-color="#fff"/>
+    <stop offset=".9" stop-color="#fff"/>
+    <stop offset="1" stop-color="#000"/>
+  </linearGradient>
+  <mask id="water" maskUnits="userSpaceOnUse" x="{px}" y="{py}" width="{pw}" height="{ph}">
+    <rect x="{px}" y="{py}" width="{pw}" height="{ph}" fill="url(#edges)"/>
+  </mask>
+  {frame_defs}
 </defs>
-<ellipse cx="{CX}" cy="{CY}" rx="360" ry="220" fill="url(#warmth)"/>
-<g font-size="10">{sky.svg()}</g>
-<g font-size="11" font-weight="700">{web.svg()}{"".join(walked)}</g>
-<g>{"".join(nodes)}</g>
-
-<g class="crawl">
-  <ellipse cx="10" cy="0" rx="62" ry="48" fill="url(#body-glow)"/>
-  <g font-size="{GLYPH_SIZE}" font-weight="700" text-anchor="middle">
-    <g class="{walk_cls}">{walk_svg}</g>
-    <g class="{idle_cls}">{idle_svg}</g>
-  </g>
+<rect x="0" y="{py}" width="{W}" height="{ph}" fill="url(#depth)"/>
+<g font-size="10">{drift.svg()}</g>
+<g mask="url(#water)">
+  {rays}
+  <g>{"".join(bubbles)}</g>
+  <g font-size="{GLYPH_SIZE}" font-weight="700" text-anchor="middle">{"".join(turtle_svg)}</g>
 </g>
 
 <g font-size="12" fill="{DIM}" letter-spacing="2">
@@ -391,11 +245,10 @@ body = f"""
 {title_svg}
 <text x="{TX}" y="300" font-size="25" fill="{INK}" letter-spacing="5">summarization agent</text>
 {"".join(readout)}
-{"".join(reading)}
 
 <line x1="40" y1="{H - 46}" x2="{W - 40}" y2="{H - 46}" stroke="{FAINT}" stroke-width="1"/>
 <g font-size="12" fill="{DIM}" letter-spacing="1.5">
-  <text x="40" y="{H - 22}">walks the scan host by host. nothing invented.</text>
+  <text x="40" y="{H - 22}">reads every host. invents nothing.</text>
   <text x="{W - 40}" y="{H - 22}" text-anchor="end">python . langgraph . synthetic data only</text>
 </g>
 """
@@ -404,11 +257,11 @@ svg = svg_doc(
     W,
     H,
     "Recon Summarization Agent",
-    "An ASCII spider walks a web whose nodes are scanned hosts, stopping at each one, "
-    "while a summary of each host appears next to the project name.",
+    "A few ASCII sea turtles drift through dark water next to the project name and a sample "
+    "summary of five scanned hosts.",
     body,
     "".join(css),
 )
 out = ROOT / "assets" / "banner.svg"
 out.write_text(svg, encoding="utf-8")
-print(f"wrote {out.relative_to(ROOT)} ({len(svg) // 1024} KB, loop {T:.2f}s)")
+print(f"wrote {out.relative_to(ROOT)} ({len(svg) // 1024} KB)")

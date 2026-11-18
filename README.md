@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="Recon Summarization Agent: an ASCII spider walks a web of scanned hosts while the summary builds up" width="100%">
+  <img src="assets/banner.svg" alt="Recon Summarization Agent: ASCII sea turtles drift through dark water next to a sample host summary" width="100%">
 </p>
 
 <p align="center">

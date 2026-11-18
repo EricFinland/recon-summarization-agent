@@ -149,7 +149,7 @@ for i, (kind, x, cols, idx, name, owner, cap) in enumerate(NODES):
                 tx,
                 name_y,
                 name,
-                "#8c7a64",
+                "#6f939a",
                 18 if idx else 14,
                 ' font-weight="700" letter-spacing="1.5"',
             )
@@ -174,7 +174,7 @@ for i, (kind, x, cols, idx, name, owner, cap) in enumerate(NODES):
 rail, lit = Layer(), Layer()
 x = 40.0
 while x < 1240:
-    rail.add(round(x, 1), RAIL, "─", "#251d16")
+    rail.add(round(x, 1), RAIL, "─", "#0d252e")
     lit.add(round(x, 1), RAIL, "━", mix(ramp(SUNSET, (x - 40) / 1200), BG, 0.25))
     x += CW
 for i, node in enumerate(NODES):

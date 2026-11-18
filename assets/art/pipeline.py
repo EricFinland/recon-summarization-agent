@@ -86,7 +86,7 @@ for i, (name, cap1, cap2) in enumerate(STAGES):
     tx = x + 2 * CW
     base = [
         t(tx, TOP + CH * 1.1, f"0{i + 1}", DIM, 12, ' letter-spacing="2"'),
-        t(tx, TOP + CH * 2.55, name, "#8c7a64", 18, ' font-weight="700" letter-spacing="1.5"'),
+        t(tx, TOP + CH * 2.55, name, "#6f939a", 18, ' font-weight="700" letter-spacing="1.5"'),
         t(tx, TOP + CH * 4.0, cap1, DIM, 13),
         t(tx, TOP + CH * 5.0, cap2, DIM, 13),
     ]
@@ -131,7 +131,7 @@ dim_check, lit_check = Layer(), Layer()
 for r, row in enumerate(check):
     for c, bit in enumerate(row):
         if bit == "#":
-            dim_check.add(vx + c * 7, vy + r * 8, "#", "#2a2119")
+            dim_check.add(vx + c * 7, vy + r * 8, "#", "#0f2a33")
             lit_check.add(vx + c * 7, vy + r * 8, "#", TEAL)
 check_svg = f'<g font-size="11" font-weight="700">{dim_check.svg()}{window(0.70, 0.985, lit_check.svg())}</g>'
 
@@ -139,7 +139,7 @@ check_svg = f'<g font-size="11" font-weight="700">{dim_check.svg()}{window(0.70,
 rail = Layer()
 x = 40.0
 while x < 1240:
-    rail.add(round(x, 1), RAIL, "─", "#251d16")
+    rail.add(round(x, 1), RAIL, "─", "#0d252e")
     x += CW
 for i in range(6):
     rail.add(round(center(i), 1), TOP + ROWS * CH - 2, "│", FAINT)
@@ -207,7 +207,7 @@ inspector = [
         KX + 74,
         PY + 6,
         "data/scans/sample_scan_02.json . hosts[0] . files01.lab.local",
-        "#7d6c58",
+        "#5c7f87",
         13,
     ),
 ]
@@ -325,8 +325,8 @@ audit = [
     f'<line x1="40" y1="{AY}" x2="1240" y2="{AY}" stroke="{FAINT}"/>',
     t(40, AY + 26, "OUTPUT/AUDIT.LOG.JSONL", DIM, 12, ' letter-spacing="2.5"'),
     t(1240, AY + 26, "APPEND ONLY", DIM, 12, ' text-anchor="end" letter-spacing="2.5"'),
-    t(40, AY + 52, old[0], "#4d4034", 12.5),
-    t(40, AY + 72, old[1], "#4d4034", 12.5),
+    t(40, AY + 52, old[0], "#2c4a54", 12.5),
+    t(40, AY + 72, old[1], "#2c4a54", 12.5),
     f'<g clip-path="url(#typing)">{t(40, AY + 92, new, TEAL, 12.5)}</g>',
 ]
 H = int(AY + 112)

@@ -33,112 +33,112 @@ text{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono
 @keyframes w17{0.00%{opacity:1}2.00%{opacity:1}96.00%{opacity:1}98.00%{opacity:0}100.00%{opacity:0}}
 </style>
 
-<rect width="1280" height="359" fill="#080605"/>
+<rect width="1280" height="359" fill="#03101a"/>
 <defs>
   <radialGradient id="tokglow">
-    <stop offset="0" stop-color="#ffc562" stop-opacity=".45"/>
-    <stop offset="1" stop-color="#ffc562" stop-opacity="0"/>
+    <stop offset="0" stop-color="#f0d49a" stop-opacity=".45"/>
+    <stop offset="1" stop-color="#f0d49a" stop-opacity="0"/>
   </radialGradient>
   <clipPath id="filled"><rect x="-2400" y="213.0" height="30" width="2400" style="animation:tok 12s cubic-bezier(.6,0,.4,1) infinite"/></clipPath>
 </defs>
-<g font-size="12" fill="#8c7a64" letter-spacing="2.5">
+<g font-size="12" fill="#6f939a" letter-spacing="2.5">
   <text x="40" y="44">WHERE IT FITS</text>
   <text x="1240" y="44" text-anchor="end">AGENT 1 OF 4 . AI-ASSISTED PENTEST POC</text>
 </g>
-<line x1="40" y1="60" x2="1240" y2="60" stroke="#33291f"/>
-<g font-size="16"><text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4 457.9 466.3 474.7 483.1 491.5 499.9 508.3 516.7 525.1 533.5 541.9 550.3 558.7 567.1 575.5 583.9 592.3 600.7 609.1 863 871.4 879.8 888.2 896.6 905 913.4 921.8 930.2 938.6 947 955.4 963.8 972.2 980.6 989 997.4 1005.8 1014.2 1080.4 1088.8 1097.2 1105.6 1114 1122.4 1130.8 1139.2 1147.6 1156 1164.4 1172.8 1181.2 1189.6 1198 1206.4 1214.8 1223.2 1231.6" y="104" fill="#33291f">┌───────────────┐┌─────────────────┐┌─────────────────┐┌─────────────────┐</text>
-<text x="240.6 249 257.4 265.8 274.2 282.6 291 299.4 307.8 316.2 324.6 333 341.4 349.8 358.2 366.6 375 383.4 391.8" y="104" fill="#c09048">┌─────────────────┐</text>
-<text x="40 174.4 457.9 609.1 863 1014.2 1080.4 1231.6" y="123" fill="#33291f">││││││││</text>
-<text x="240.6 391.8" y="123" fill="#c09048">││</text>
-<text x="40 174.4 457.9 609.1 863 1014.2 1080.4 1231.6" y="142" fill="#33291f">││││││││</text>
-<text x="240.6 391.8" y="142" fill="#c09048">││</text>
-<text x="40 174.4 457.9 609.1 863 1014.2 1080.4 1231.6" y="161" fill="#33291f">││││││││</text>
-<text x="240.6 391.8" y="161" fill="#c09048">││</text>
-<text x="40 174.4 457.9 609.1 863 1014.2 1080.4 1231.6" y="180" fill="#33291f">││││││││</text>
-<text x="240.6 391.8" y="180" fill="#c09048">││</text>
-<text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4 457.9 466.3 474.7 483.1 491.5 499.9 508.3 516.7 525.1 533.5 541.9 550.3 558.7 567.1 575.5 583.9 592.3 600.7 609.1 863 871.4 879.8 888.2 896.6 905 913.4 921.8 930.2 938.6 947 955.4 963.8 972.2 980.6 989 997.4 1005.8 1014.2 1080.4 1088.8 1097.2 1105.6 1114 1122.4 1130.8 1139.2 1147.6 1156 1164.4 1172.8 1181.2 1189.6 1198 1206.4 1214.8 1223.2 1231.6" y="199" fill="#33291f">└───────────────┘└─────────────────┘└─────────────────┘└─────────────────┘</text>
-<text x="240.6 249 257.4 265.8 274.2 282.6 291 299.4 307.8 316.2 324.6 333 341.4 349.8 358.2 366.6 375 383.4 391.8" y="199" fill="#c09048">└─────────────────┘</text></g>
-<text x="56.8" y="145.8" font-size="14" fill="#8c7a64" font-weight="700" letter-spacing="1.5">SCAN FILE</text><g style="opacity:0;animation:w1 12s linear infinite"><text x="56.8" y="145.8" font-size="14" fill="#54483c" font-weight="700" letter-spacing="1.5">SCAN FILE</text></g><g style="opacity:0;animation:w2 12s linear infinite"><g font-size="16"><text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4" y="104" fill="#8c7a64">┌───────────────┐</text>
-<text x="40 174.4" y="123" fill="#8c7a64">││</text>
-<text x="40 174.4" y="142" fill="#8c7a64">││</text>
-<text x="40 174.4" y="161" fill="#8c7a64">││</text>
-<text x="40 174.4" y="180" fill="#8c7a64">││</text>
-<text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4" y="199" fill="#8c7a64">└───────────────┘</text></g><text x="56.8" y="145.8" font-size="14" fill="#8c7a64" font-weight="700" letter-spacing="1.5">SCAN FILE</text></g><text x="56.8" y="171.4" font-size="13" fill="#8c7a64">json or nmap xml</text><text x="257.4" y="124.9" font-size="12" fill="#8c7a64" letter-spacing="2">01</text><text x="383.4" y="124.9" font-size="10" fill="#ffc562" text-anchor="end" letter-spacing="1.5">THIS REPO</text><text font-size="18" font-weight="700" letter-spacing="1.5" y="153.4"><tspan x="257.4" fill="#fcf0d8">R</tspan><tspan x="269.7" fill="#fcd89c">E</tspan><tspan x="282" fill="#fcc060">C</tspan><tspan x="294.3" fill="#fca83c">O</tspan><tspan x="306.6" fill="#e48424">N</tspan></text><g class="peek" font-size="14" font-weight="700"><text x="333" y="153.4" font-size="14" fill="#f08a24">&lt;</text><text x="341.4" y="153.4" font-size="14" fill="#e9d3a8">(</text><text x="349.8" y="153.4" font-size="14" fill="#ffc562">@</text><text x="358.2" y="153.4" font-size="14" fill="#e9d3a8">)</text><text x="366.6" y="153.4" font-size="14" fill="#f08a24">&gt;</text></g><text x="257.4" y="179.1" font-size="13" fill="#8c7a64">summarize the scan</text><text x="474.7" y="124.9" font-size="12" fill="#8c7a64" letter-spacing="2">02</text><text x="600.7" y="124.9" font-size="10" fill="#8c7a64" text-anchor="end" letter-spacing="1.5">GROUP 2</text><text x="474.7" y="153.4" font-size="18" fill="#8c7a64" font-weight="700" letter-spacing="1.5">CLASSIFY</text><g style="opacity:0;animation:w3 12s linear infinite"><text x="474.7" y="153.4" font-size="18" fill="#90846c" font-weight="700" letter-spacing="1.5">CLASSIFY</text></g><g style="opacity:0;animation:w4 12s linear infinite"><g font-size="16"><text x="457.9 466.3 474.7 483.1 491.5 499.9 508.3 516.7 525.1 533.5 541.9 550.3 558.7 567.1 575.5 583.9 592.3 600.7 609.1" y="104" fill="#e9d3a8">┌─────────────────┐</text>
-<text x="457.9 609.1" y="123" fill="#e9d3a8">││</text>
-<text x="457.9 609.1" y="142" fill="#e9d3a8">││</text>
-<text x="457.9 609.1" y="161" fill="#e9d3a8">││</text>
-<text x="457.9 609.1" y="180" fill="#e9d3a8">││</text>
-<text x="457.9 466.3 474.7 483.1 491.5 499.9 508.3 516.7 525.1 533.5 541.9 550.3 558.7 567.1 575.5 583.9 592.3 600.7 609.1" y="199" fill="#e9d3a8">└─────────────────┘</text></g><text x="474.7" y="153.4" font-size="18" fill="#e9d3a8" font-weight="700" letter-spacing="1.5">CLASSIFY</text></g><text x="474.7" y="179.1" font-size="13" fill="#8c7a64">findings + cvss</text><g font-size="15" font-weight="700"><text x="731.5 740.7" y="103.5" fill="#906c3c">/\</text>
-<text x="716.8 755.4" y="114.5" fill="#906c3c">/\</text>
-<text x="702.1 770.1" y="125.5" fill="#906c3c">/\</text>
-<text x="687.4 784.8" y="136.5" fill="#906c3c">/\</text>
-<text x="672.7 799.5" y="147.5" fill="#906c3c">&lt;&gt;</text>
-<text x="687.4 784.8" y="158.5" fill="#906c3c">\/</text>
-<text x="702.1 770.1" y="169.5" fill="#906c3c">\/</text>
-<text x="716.8 755.4" y="180.5" fill="#906c3c">\/</text>
-<text x="731.5 740.7" y="191.5" fill="#906c3c">\/</text></g><g style="opacity:0;animation:w5 12s linear infinite"><g font-size="15" font-weight="700"><text x="731.5 740.7" y="103.5" fill="#ffc562">/\</text>
-<text x="716.8 755.4" y="114.5" fill="#ffc562">/\</text>
-<text x="702.1 770.1" y="125.5" fill="#ffc562">/\</text>
-<text x="687.4 784.8" y="136.5" fill="#ffc562">/\</text>
-<text x="672.7 799.5" y="147.5" fill="#ffc562">&lt;&gt;</text>
-<text x="687.4 784.8" y="158.5" fill="#ffc562">\/</text>
-<text x="702.1 770.1" y="169.5" fill="#ffc562">\/</text>
-<text x="716.8 755.4" y="180.5" fill="#ffc562">\/</text>
-<text x="731.5 740.7" y="191.5" fill="#ffc562">\/</text></g></g><text x="740.3" y="145.5" font-size="11" fill="#ffc562" text-anchor="middle" letter-spacing="2">HUMAN</text><text x="740.3" y="159.5" font-size="11" fill="#ffc562" text-anchor="middle" letter-spacing="2">GATE</text><text x="879.8" y="124.9" font-size="12" fill="#8c7a64" letter-spacing="2">03</text><text x="879.8" y="153.4" font-size="18" fill="#8c7a64" font-weight="700" letter-spacing="1.5">PRIORITIZE</text><g style="opacity:0;animation:w6 12s linear infinite"><text x="879.8" y="153.4" font-size="18" fill="#905418" font-weight="700" letter-spacing="1.5">PRIORITIZE</text></g><g style="opacity:0;animation:w7 12s linear infinite"><g font-size="16"><text x="863 871.4 879.8 888.2 896.6 905 913.4 921.8 930.2 938.6 947 955.4 963.8 972.2 980.6 989 997.4 1005.8 1014.2" y="104" fill="#f09024">┌─────────────────┐</text>
-<text x="863 1014.2" y="123" fill="#f09024">││</text>
-<text x="863 1014.2" y="142" fill="#f09024">││</text>
-<text x="863 1014.2" y="161" fill="#f09024">││</text>
-<text x="863 1014.2" y="180" fill="#f09024">││</text>
-<text x="863 871.4 879.8 888.2 896.6 905 913.4 921.8 930.2 938.6 947 955.4 963.8 972.2 980.6 989 997.4 1005.8 1014.2" y="199" fill="#f09024">└─────────────────┘</text></g><text x="879.8" y="153.4" font-size="18" fill="#f09024" font-weight="700" letter-spacing="1.5">PRIORITIZE</text></g><text x="879.8" y="179.1" font-size="13" fill="#8c7a64">rank by risk</text><text x="1097.2" y="124.9" font-size="12" fill="#8c7a64" letter-spacing="2">04</text><text x="1097.2" y="153.4" font-size="18" fill="#8c7a64" font-weight="700" letter-spacing="1.5">REPORT</text><g style="opacity:0;animation:w8 12s linear infinite"><text x="1097.2" y="153.4" font-size="18" fill="#9c906c" font-weight="700" letter-spacing="1.5">REPORT</text></g><g style="opacity:0;animation:w9 12s linear infinite"><g font-size="16"><text x="1080.4 1088.8 1097.2 1105.6 1114 1122.4 1130.8 1139.2 1147.6 1156 1164.4 1172.8 1181.2 1189.6 1198 1206.4 1214.8 1223.2 1231.6" y="104" fill="#fce4b4">┌─────────────────┐</text>
-<text x="1080.4 1231.6" y="123" fill="#fce4b4">││</text>
-<text x="1080.4 1231.6" y="142" fill="#fce4b4">││</text>
-<text x="1080.4 1231.6" y="161" fill="#fce4b4">││</text>
-<text x="1080.4 1231.6" y="180" fill="#fce4b4">││</text>
-<text x="1080.4 1088.8 1097.2 1105.6 1114 1122.4 1130.8 1139.2 1147.6 1156 1164.4 1172.8 1181.2 1189.6 1198 1206.4 1214.8 1223.2 1231.6" y="199" fill="#fce4b4">└─────────────────┘</text></g><text x="1097.2" y="153.4" font-size="18" fill="#fce4b4" font-weight="700" letter-spacing="1.5">REPORT</text></g><text x="1097.2" y="179.1" font-size="13" fill="#8c7a64">draft for sign-off</text>
-<g font-size="16"><text x="111.4 320.4 537.7 942.8 1160.2" y="214" fill="#33291f">│││││</text>
-<text x="740.3" y="215" fill="#846030">│</text>
-<text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4 182.8 191.2 199.6 208 216.4 224.8 233.2 241.6 250 258.4 266.8 275.2 283.6 292 300.4 308.8 317.2 325.6 334 342.4 350.8 359.2 367.6 376 384.4 392.8 401.2 409.6 418 426.4 434.8 443.2 451.6 460 468.4 476.8 485.2 493.6 502 510.4 518.8 527.2 535.6 544 552.4 560.8 569.2 577.6 586 594.4 602.8 611.2 619.6 628 636.4 644.8 653.2 661.6 670 678.4 686.8 695.2 703.6 712 720.4 728.8 737.2 745.6 754 762.4 770.8 779.2 787.6 796 804.4 812.8 821.2 829.6 838 846.4 854.8 863.2 871.6 880 888.4 896.8 905.2 913.6 922 930.4 938.8 947.2 955.6 964 972.4 980.8 989.2 997.6 1006 1014.4 1022.8 1031.2 1039.6 1048 1056.4 1064.8 1073.2 1081.6 1090 1098.4 1106.8 1115.2 1123.6 1132 1140.4 1148.8 1157.2 1165.6 1174 1182.4 1190.8 1199.2 1207.6 1216 1224.4 1232.8" y="233" fill="#251d16">───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
-<text x="111.4 320.4 537.7 740.3 942.8 1160.2" y="233" fill="#33291f">┴┴┴┴┴┴</text></g>
-<g style="opacity:0;animation:w17 12s linear infinite"><g font-size="16" clip-path="url(#filled)"><text x="1232.8" y="233" fill="#843c18">━</text>
-<text x="1207.6 1216 1224.4" y="233" fill="#903c18">━━━</text>
-<text x="1165.6 1174 1182.4 1190.8 1199.2" y="233" fill="#904818">━━━━━</text>
-<text x="1140.4 1148.8 1157.2" y="233" fill="#9c4818">━━━</text>
-<text x="1106.8 1115.2 1123.6 1132" y="233" fill="#9c5418">━━━━</text>
-<text x="1081.6 1090 1098.4" y="233" fill="#a85418">━━━</text>
-<text x="972.4 980.8 989.2 997.6 1006 1014.4 1022.8 1031.2 1039.6 1048 1056.4 1064.8 1073.2" y="233" fill="#a86018">━━━━━━━━━━━━━</text>
-<text x="947.2 955.6 964" y="233" fill="#b46018">━━━</text>
-<text x="905.2 913.6 922 930.4 938.8" y="233" fill="#b46c18">━━━━━</text>
-<text x="854.8 863.2 871.6 880 888.4 896.8" y="233" fill="#b46c24">━━━━━━</text>
-<text x="821.2 829.6 838 846.4" y="233" fill="#b47824">━━━━</text>
-<text x="779.2 787.6 796 804.4 812.8" y="233" fill="#b47830">━━━━━</text>
-<text x="770.8" y="233" fill="#c07830">━</text>
-<text x="737.2 745.6 754 762.4" y="233" fill="#c08430">━━━━</text>
-<text x="602.8 611.2 619.6 628 636.4 644.8 653.2 661.6 670 678.4 686.8 695.2 703.6 712 720.4 728.8" y="233" fill="#c0843c">━━━━━━━━━━━━━━━━</text>
-<text x="577.6 586 594.4" y="233" fill="#c0903c">━━━</text>
-<text x="510.4 518.8 527.2 535.6 544 552.4 560.8 569.2" y="233" fill="#c09048">━━━━━━━━</text>
-<text x="451.6 460 468.4 476.8 485.2 493.6 502" y="233" fill="#c09c54">━━━━━━━</text>
-<text x="376 384.4 392.8 401.2 409.6 418 426.4 434.8 443.2" y="233" fill="#c09c60">━━━━━━━━━</text>
-<text x="350.8 359.2 367.6" y="233" fill="#c0a860">━━━</text>
-<text x="300.4 308.8 317.2 325.6 334 342.4" y="233" fill="#c0a86c">━━━━━━</text>
-<text x="250 258.4 266.8 275.2 283.6 292" y="233" fill="#c0a878">━━━━━━</text>
-<text x="149.2 157.6 166 174.4 182.8 191.2 199.6 208 216.4 224.8 233.2 241.6" y="233" fill="#c0a884">━━━━━━━━━━━━</text>
-<text x="107.2 115.6 124 132.4 140.8" y="233" fill="#c0a890">━━━━━</text>
-<text x="98.8" y="233" fill="#c0b490">━</text>
-<text x="48.4 56.8 65.2 73.6 82 90.4" y="233" fill="#c0b49c">━━━━━━</text>
-<text x="40" y="233" fill="#c0b4a8">━</text></g></g>
+<line x1="40" y1="60" x2="1240" y2="60" stroke="#163440"/>
+<g font-size="16"><text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4 457.9 466.3 474.7 483.1 491.5 499.9 508.3 516.7 525.1 533.5 541.9 550.3 558.7 567.1 575.5 583.9 592.3 600.7 609.1 863 871.4 879.8 888.2 896.6 905 913.4 921.8 930.2 938.6 947 955.4 963.8 972.2 980.6 989 997.4 1005.8 1014.2 1080.4 1088.8 1097.2 1105.6 1114 1122.4 1130.8 1139.2 1147.6 1156 1164.4 1172.8 1181.2 1189.6 1198 1206.4 1214.8 1223.2 1231.6" y="104" fill="#163440">┌───────────────┐┌─────────────────┐┌─────────────────┐┌─────────────────┐</text>
+<text x="240.6 249 257.4 265.8 274.2 282.6 291 299.4 307.8 316.2 324.6 333 341.4 349.8 358.2 366.6 375 383.4 391.8" y="104" fill="#78b4a8">┌─────────────────┐</text>
+<text x="40 174.4 457.9 609.1 863 1014.2 1080.4 1231.6" y="123" fill="#163440">││││││││</text>
+<text x="240.6 391.8" y="123" fill="#78b4a8">││</text>
+<text x="40 174.4 457.9 609.1 863 1014.2 1080.4 1231.6" y="142" fill="#163440">││││││││</text>
+<text x="240.6 391.8" y="142" fill="#78b4a8">││</text>
+<text x="40 174.4 457.9 609.1 863 1014.2 1080.4 1231.6" y="161" fill="#163440">││││││││</text>
+<text x="240.6 391.8" y="161" fill="#78b4a8">││</text>
+<text x="40 174.4 457.9 609.1 863 1014.2 1080.4 1231.6" y="180" fill="#163440">││││││││</text>
+<text x="240.6 391.8" y="180" fill="#78b4a8">││</text>
+<text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4 457.9 466.3 474.7 483.1 491.5 499.9 508.3 516.7 525.1 533.5 541.9 550.3 558.7 567.1 575.5 583.9 592.3 600.7 609.1 863 871.4 879.8 888.2 896.6 905 913.4 921.8 930.2 938.6 947 955.4 963.8 972.2 980.6 989 997.4 1005.8 1014.2 1080.4 1088.8 1097.2 1105.6 1114 1122.4 1130.8 1139.2 1147.6 1156 1164.4 1172.8 1181.2 1189.6 1198 1206.4 1214.8 1223.2 1231.6" y="199" fill="#163440">└───────────────┘└─────────────────┘└─────────────────┘└─────────────────┘</text>
+<text x="240.6 249 257.4 265.8 274.2 282.6 291 299.4 307.8 316.2 324.6 333 341.4 349.8 358.2 366.6 375 383.4 391.8" y="199" fill="#78b4a8">└─────────────────┘</text></g>
+<text x="56.8" y="145.8" font-size="14" fill="#6f939a" font-weight="700" letter-spacing="1.5">SCAN FILE</text><g style="opacity:0;animation:w1 12s linear infinite"><text x="56.8" y="145.8" font-size="14" fill="#48606c" font-weight="700" letter-spacing="1.5">SCAN FILE</text></g><g style="opacity:0;animation:w2 12s linear infinite"><g font-size="16"><text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4" y="104" fill="#6f939a">┌───────────────┐</text>
+<text x="40 174.4" y="123" fill="#6f939a">││</text>
+<text x="40 174.4" y="142" fill="#6f939a">││</text>
+<text x="40 174.4" y="161" fill="#6f939a">││</text>
+<text x="40 174.4" y="180" fill="#6f939a">││</text>
+<text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4" y="199" fill="#6f939a">└───────────────┘</text></g><text x="56.8" y="145.8" font-size="14" fill="#6f939a" font-weight="700" letter-spacing="1.5">SCAN FILE</text></g><text x="56.8" y="171.4" font-size="13" fill="#6f939a">json or nmap xml</text><text x="257.4" y="124.9" font-size="12" fill="#6f939a" letter-spacing="2">01</text><text x="383.4" y="124.9" font-size="10" fill="#9ee8d4" text-anchor="end" letter-spacing="1.5">THIS REPO</text><text font-size="18" font-weight="700" letter-spacing="1.5" y="153.4"><tspan x="257.4" fill="#f0fcfc">R</tspan><tspan x="269.7" fill="#ccf0e4">E</tspan><tspan x="282" fill="#9ce4d8">C</tspan><tspan x="294.3" fill="#6cd8c0">O</tspan><tspan x="306.6" fill="#3cc0a8">N</tspan></text><g class="peek" font-size="14" font-weight="700"><text x="333" y="153.4" font-size="14" fill="#f0d49a">&lt;</text><text x="341.4" y="153.4" font-size="14" fill="#bdeee1">(</text><text x="349.8" y="153.4" font-size="14" fill="#f0d49a">@</text><text x="358.2" y="153.4" font-size="14" fill="#bdeee1">)</text><text x="366.6" y="153.4" font-size="14" fill="#f0d49a">&gt;</text></g><text x="257.4" y="179.1" font-size="13" fill="#6f939a">summarize the scan</text><text x="474.7" y="124.9" font-size="12" fill="#6f939a" letter-spacing="2">02</text><text x="600.7" y="124.9" font-size="10" fill="#6f939a" text-anchor="end" letter-spacing="1.5">GROUP 2</text><text x="474.7" y="153.4" font-size="18" fill="#6f939a" font-weight="700" letter-spacing="1.5">CLASSIFY</text><g style="opacity:0;animation:w3 12s linear infinite"><text x="474.7" y="153.4" font-size="18" fill="#789090" font-weight="700" letter-spacing="1.5">CLASSIFY</text></g><g style="opacity:0;animation:w4 12s linear infinite"><g font-size="16"><text x="457.9 466.3 474.7 483.1 491.5 499.9 508.3 516.7 525.1 533.5 541.9 550.3 558.7 567.1 575.5 583.9 592.3 600.7 609.1" y="104" fill="#bdeee1">┌─────────────────┐</text>
+<text x="457.9 609.1" y="123" fill="#bdeee1">││</text>
+<text x="457.9 609.1" y="142" fill="#bdeee1">││</text>
+<text x="457.9 609.1" y="161" fill="#bdeee1">││</text>
+<text x="457.9 609.1" y="180" fill="#bdeee1">││</text>
+<text x="457.9 466.3 474.7 483.1 491.5 499.9 508.3 516.7 525.1 533.5 541.9 550.3 558.7 567.1 575.5 583.9 592.3 600.7 609.1" y="199" fill="#bdeee1">└─────────────────┘</text></g><text x="474.7" y="153.4" font-size="18" fill="#bdeee1" font-weight="700" letter-spacing="1.5">CLASSIFY</text></g><text x="474.7" y="179.1" font-size="13" fill="#6f939a">findings + cvss</text><g font-size="15" font-weight="700"><text x="731.5 740.7" y="103.5" fill="#847860">/\</text>
+<text x="716.8 755.4" y="114.5" fill="#847860">/\</text>
+<text x="702.1 770.1" y="125.5" fill="#847860">/\</text>
+<text x="687.4 784.8" y="136.5" fill="#847860">/\</text>
+<text x="672.7 799.5" y="147.5" fill="#847860">&lt;&gt;</text>
+<text x="687.4 784.8" y="158.5" fill="#847860">\/</text>
+<text x="702.1 770.1" y="169.5" fill="#847860">\/</text>
+<text x="716.8 755.4" y="180.5" fill="#847860">\/</text>
+<text x="731.5 740.7" y="191.5" fill="#847860">\/</text></g><g style="opacity:0;animation:w5 12s linear infinite"><g font-size="15" font-weight="700"><text x="731.5 740.7" y="103.5" fill="#f0d49a">/\</text>
+<text x="716.8 755.4" y="114.5" fill="#f0d49a">/\</text>
+<text x="702.1 770.1" y="125.5" fill="#f0d49a">/\</text>
+<text x="687.4 784.8" y="136.5" fill="#f0d49a">/\</text>
+<text x="672.7 799.5" y="147.5" fill="#f0d49a">&lt;&gt;</text>
+<text x="687.4 784.8" y="158.5" fill="#f0d49a">\/</text>
+<text x="702.1 770.1" y="169.5" fill="#f0d49a">\/</text>
+<text x="716.8 755.4" y="180.5" fill="#f0d49a">\/</text>
+<text x="731.5 740.7" y="191.5" fill="#f0d49a">\/</text></g></g><text x="740.3" y="145.5" font-size="11" fill="#f0d49a" text-anchor="middle" letter-spacing="2">HUMAN</text><text x="740.3" y="159.5" font-size="11" fill="#f0d49a" text-anchor="middle" letter-spacing="2">GATE</text><text x="879.8" y="124.9" font-size="12" fill="#6f939a" letter-spacing="2">03</text><text x="879.8" y="153.4" font-size="18" fill="#6f939a" font-weight="700" letter-spacing="1.5">PRIORITIZE</text><g style="opacity:0;animation:w6 12s linear infinite"><text x="879.8" y="153.4" font-size="18" fill="#247878" font-weight="700" letter-spacing="1.5">PRIORITIZE</text></g><g style="opacity:0;animation:w7 12s linear infinite"><g font-size="16"><text x="863 871.4 879.8 888.2 896.6 905 913.4 921.8 930.2 938.6 947 955.4 963.8 972.2 980.6 989 997.4 1005.8 1014.2" y="104" fill="#3cc0b4">┌─────────────────┐</text>
+<text x="863 1014.2" y="123" fill="#3cc0b4">││</text>
+<text x="863 1014.2" y="142" fill="#3cc0b4">││</text>
+<text x="863 1014.2" y="161" fill="#3cc0b4">││</text>
+<text x="863 1014.2" y="180" fill="#3cc0b4">││</text>
+<text x="863 871.4 879.8 888.2 896.6 905 913.4 921.8 930.2 938.6 947 955.4 963.8 972.2 980.6 989 997.4 1005.8 1014.2" y="199" fill="#3cc0b4">└─────────────────┘</text></g><text x="879.8" y="153.4" font-size="18" fill="#3cc0b4" font-weight="700" letter-spacing="1.5">PRIORITIZE</text></g><text x="879.8" y="179.1" font-size="13" fill="#6f939a">rank by risk</text><text x="1097.2" y="124.9" font-size="12" fill="#6f939a" letter-spacing="2">04</text><text x="1097.2" y="153.4" font-size="18" fill="#6f939a" font-weight="700" letter-spacing="1.5">REPORT</text><g style="opacity:0;animation:w8 12s linear infinite"><text x="1097.2" y="153.4" font-size="18" fill="#789c90" font-weight="700" letter-spacing="1.5">REPORT</text></g><g style="opacity:0;animation:w9 12s linear infinite"><g font-size="16"><text x="1080.4 1088.8 1097.2 1105.6 1114 1122.4 1130.8 1139.2 1147.6 1156 1164.4 1172.8 1181.2 1189.6 1198 1206.4 1214.8 1223.2 1231.6" y="104" fill="#ccf0e4">┌─────────────────┐</text>
+<text x="1080.4 1231.6" y="123" fill="#ccf0e4">││</text>
+<text x="1080.4 1231.6" y="142" fill="#ccf0e4">││</text>
+<text x="1080.4 1231.6" y="161" fill="#ccf0e4">││</text>
+<text x="1080.4 1231.6" y="180" fill="#ccf0e4">││</text>
+<text x="1080.4 1088.8 1097.2 1105.6 1114 1122.4 1130.8 1139.2 1147.6 1156 1164.4 1172.8 1181.2 1189.6 1198 1206.4 1214.8 1223.2 1231.6" y="199" fill="#ccf0e4">└─────────────────┘</text></g><text x="1097.2" y="153.4" font-size="18" fill="#ccf0e4" font-weight="700" letter-spacing="1.5">REPORT</text></g><text x="1097.2" y="179.1" font-size="13" fill="#6f939a">draft for sign-off</text>
+<g font-size="16"><text x="111.4 320.4 537.7 942.8 1160.2" y="214" fill="#163440">│││││</text>
+<text x="740.3" y="215" fill="#787854">│</text>
+<text x="40 48.4 56.8 65.2 73.6 82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4 182.8 191.2 199.6 208 216.4 224.8 233.2 241.6 250 258.4 266.8 275.2 283.6 292 300.4 308.8 317.2 325.6 334 342.4 350.8 359.2 367.6 376 384.4 392.8 401.2 409.6 418 426.4 434.8 443.2 451.6 460 468.4 476.8 485.2 493.6 502 510.4 518.8 527.2 535.6 544 552.4 560.8 569.2 577.6 586 594.4 602.8 611.2 619.6 628 636.4 644.8 653.2 661.6 670 678.4 686.8 695.2 703.6 712 720.4 728.8 737.2 745.6 754 762.4 770.8 779.2 787.6 796 804.4 812.8 821.2 829.6 838 846.4 854.8 863.2 871.6 880 888.4 896.8 905.2 913.6 922 930.4 938.8 947.2 955.6 964 972.4 980.8 989.2 997.6 1006 1014.4 1022.8 1031.2 1039.6 1048 1056.4 1064.8 1073.2 1081.6 1090 1098.4 1106.8 1115.2 1123.6 1132 1140.4 1148.8 1157.2 1165.6 1174 1182.4 1190.8 1199.2 1207.6 1216 1224.4 1232.8" y="233" fill="#0d252e">───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
+<text x="111.4 320.4 537.7 740.3 942.8 1160.2" y="233" fill="#163440">┴┴┴┴┴┴</text></g>
+<g style="opacity:0;animation:w17 12s linear infinite"><g font-size="16" clip-path="url(#filled)"><text x="1207.6 1216 1224.4 1232.8" y="233" fill="#186c78">━━━━</text>
+<text x="1140.4 1148.8 1157.2 1165.6 1174 1182.4 1190.8 1199.2" y="233" fill="#187878">━━━━━━━━</text>
+<text x="1090 1098.4 1106.8 1115.2 1123.6 1132" y="233" fill="#188478">━━━━━━</text>
+<text x="1081.6" y="233" fill="#248478">━</text>
+<text x="1064.8 1073.2" y="233" fill="#249078">━━</text>
+<text x="1006 1014.4 1022.8 1031.2 1039.6 1048 1056.4" y="233" fill="#249084">━━━━━━━</text>
+<text x="964 972.4 980.8 989.2 997.6" y="233" fill="#309084">━━━━━</text>
+<text x="947.2 955.6" y="233" fill="#309090">━━</text>
+<text x="930.4 938.8" y="233" fill="#309c90">━━</text>
+<text x="829.6 838 846.4 854.8 863.2 871.6 880 888.4 896.8 905.2 913.6 922" y="233" fill="#3c9c90">━━━━━━━━━━━━</text>
+<text x="821.2" y="233" fill="#3c9c9c">━</text>
+<text x="796 804.4 812.8" y="233" fill="#489c9c">━━━</text>
+<text x="770.8 779.2 787.6" y="233" fill="#48a89c">━━━</text>
+<text x="720.4 728.8 737.2 745.6 754 762.4" y="233" fill="#54a89c">━━━━━━</text>
+<text x="644.8 653.2 661.6 670 678.4 686.8 695.2 703.6 712" y="233" fill="#60a89c">━━━━━━━━━</text>
+<text x="611.2 619.6 628 636.4" y="233" fill="#60b49c">━━━━</text>
+<text x="560.8 569.2 577.6 586 594.4 602.8" y="233" fill="#6cb49c">━━━━━━</text>
+<text x="544 552.4" y="233" fill="#78b49c">━━</text>
+<text x="502 510.4 518.8 527.2 535.6" y="233" fill="#78b4a8">━━━━━</text>
+<text x="401.2 409.6 418 426.4 434.8 443.2 451.6 460 468.4 476.8 485.2 493.6" y="233" fill="#84b4a8">━━━━━━━━━━━━</text>
+<text x="359.2 367.6 376 384.4 392.8" y="233" fill="#84b4b4">━━━━━</text>
+<text x="292 300.4 308.8 317.2 325.6 334 342.4 350.8" y="233" fill="#90b4b4">━━━━━━━━</text>
+<text x="250 258.4 266.8 275.2 283.6" y="233" fill="#9cb4b4">━━━━━</text>
+<text x="233.2 241.6" y="233" fill="#9cb4c0">━━</text>
+<text x="216.4 224.8" y="233" fill="#9cc0c0">━━</text>
+<text x="82 90.4 98.8 107.2 115.6 124 132.4 140.8 149.2 157.6 166 174.4 182.8 191.2 199.6 208" y="233" fill="#a8c0c0">━━━━━━━━━━━━━━━━</text>
+<text x="40 48.4 56.8 65.2 73.6" y="233" fill="#b4c0c0">━━━━━</text></g></g>
 
 <g style="animation:tok 12s cubic-bezier(.6,0,.4,1) infinite">
   <g style="animation:tokfade 12s linear infinite">
     <circle cx="0" cy="228.0" r="16" fill="url(#tokglow)"/>
-    <text x="-27" y="234" font-size="16" fill="#483018">.</text>
-    <text x="-19" y="234" font-size="16" fill="#846030">:</text>
-    <text x="-5" y="234" font-size="16" fill="#ffc562">◆</text>
-    <g style="opacity:0;animation:w10 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#f4e7d0" text-anchor="middle">scan</text></g><g style="opacity:0;animation:w11 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#ffc562" text-anchor="middle">recon_summary</text></g><g style="opacity:0;animation:w12 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#f4e7d0" text-anchor="middle">findings + cvss</text></g><g style="opacity:0;animation:w13 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#f4e7d0" text-anchor="middle">approved</text></g><g style="opacity:0;animation:w14 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#f4e7d0" text-anchor="middle">ranked risks</text></g><g style="opacity:0;animation:w15 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#f4e7d0" text-anchor="middle">report draft</text></g>
+    <text x="-27" y="234" font-size="16" fill="#3c3c3c">.</text>
+    <text x="-19" y="234" font-size="16" fill="#787854">:</text>
+    <text x="-5" y="234" font-size="16" fill="#f0d49a">◆</text>
+    <g style="opacity:0;animation:w10 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#e2f7f1" text-anchor="middle">scan</text></g><g style="opacity:0;animation:w11 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#9ee8d4" text-anchor="middle">recon_summary</text></g><g style="opacity:0;animation:w12 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#e2f7f1" text-anchor="middle">findings + cvss</text></g><g style="opacity:0;animation:w13 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#e2f7f1" text-anchor="middle">approved</text></g><g style="opacity:0;animation:w14 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#e2f7f1" text-anchor="middle">ranked risks</text></g><g style="opacity:0;animation:w15 12s linear infinite"><text x="0" y="257" font-size="12.5" fill="#e2f7f1" text-anchor="middle">report draft</text></g>
   </g>
 </g>
-<g style="opacity:0;animation:w16 12s linear infinite"><g style="animation:wait .9s steps(1) infinite"><text x="740.3" y="281" font-size="12.5" fill="#ffc562" text-anchor="middle" letter-spacing="1">awaiting approval</text></g></g>
-<line x1="40" y1="309.0" x2="1240" y2="309.0" stroke="#33291f"/>
-<text x="40" y="337.0" font-size="13" fill="#8c7a64">decision support only. never scans, never touches a target, never rates risk.</text>
-<text x="1240" y="337.0" font-size="12" fill="#8c7a64" text-anchor="end" letter-spacing="2.5">SYNTHETIC DATA ONLY</text>
+<g style="opacity:0;animation:w16 12s linear infinite"><g style="animation:wait .9s steps(1) infinite"><text x="740.3" y="281" font-size="12.5" fill="#f0d49a" text-anchor="middle" letter-spacing="1">awaiting approval</text></g></g>
+<line x1="40" y1="309.0" x2="1240" y2="309.0" stroke="#163440"/>
+<text x="40" y="337.0" font-size="13" fill="#6f939a">decision support only. never scans, never touches a target, never rates risk.</text>
+<text x="1240" y="337.0" font-size="12" fill="#6f939a" text-anchor="end" letter-spacing="2.5">SYNTHETIC DATA ONLY</text>
 
 </svg>
