@@ -1,17 +1,25 @@
-"""Top banner: an eye drawn with the agent's own source code.
+"""Top banner: an ASCII spider walking a web of scanned hosts.
 
 Run from the repo root:  python assets/art/banner.py
 Writes assets/banner.svg.
 
-The eye is a brightness field (iris fibres, crypts, collarette, eyelid fold,
-lashes, waterline, catchlight) sampled on a fine character grid. Brightness
-picks both the glyph weight and its colour on one warm ramp.
+The web's nodes are the hosts in data/scans/sample_scan_01.json. The spider
+walks the strands from host to host and stops to read each one, and the
+summary on the right gains a line per host as it goes.
+
+The spider itself comes from spider_gait.json.gz: glyph frames of one leg cycle
+(walking) and a slow idle loop, recorded from an ASCII creature engine. Every
+other part of the picture is computed here. Everything runs on CSS animations
+that share one loop, so the parts never drift apart.
 """
 
 from __future__ import annotations
 
+import gzip
+import json
 import math
-import random
+from collections import defaultdict
+from html import escape
 
 from kit import (
     BG,
@@ -20,382 +28,356 @@ from kit import (
     INK,
     ROOT,
     WARM,
-    CodeInk,
     Layer,
-    box_blur,
-    hex2rgb,
     mix,
+    num,
     pixel_blocks,
-    png_data_uri,
     ramp,
-    smoothstep,
     stars,
     svg_doc,
 )
 
-W, H = 1280, 480
-CX, CY = 372, 252  # centre of the eye opening
-EW = 300  # half width of the opening
-UP, LO = 104, 86  # lid heights above and below the centre
-IX, IY = 10, -4  # iris centre, relative to the opening
-R, RP = 104, 35  # iris and pupil radius
-CW, CH = 3.3, 4.7  # glyph cell: about four times finer than a normal terminal
-FONT_SIZE = 5.9
-SPAN_X, SPAN_Y = 352, 190  # area of the drawing around the eye
+W, H = 1280, 520
+GOLD_RAMP = [(0.0, "#8f4312"), (0.45, "#ffc562"), (1.0, "#fff4de")]
 
-rnd = random.Random(21)
-ink = CodeInk(
-    "src/recon_agent/summarizer.py",
-    "src/recon_agent/validator.py",
-    "src/recon_agent/sanitizer.py",
-)
-ink_alt = CodeInk("src/recon_agent/loader.py", "src/recon_agent/pipeline.py")
+# ----------------------------------------------------------------- the web
 
+CX, CY, SX = 380, 262, 2.0
+RINGS = [24, 50, 76, 102, 128]
+SPOKES = 12
+SPEED = 95  # px/s along the strands
+PAUSE = 1.15  # s spent reading each host
+STEP = 1 / 15  # keyframe spacing for the walk, in seconds
 
-# ----------------------------------------------------------------- noise
-
-
-def _hash(i: int, j: int, seed: int) -> float:
-    h = (i * 374761393 + j * 668265263 + seed * 1442695041) & 0xFFFFFFFF
-    h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
-    return (h ^ (h >> 16)) / 0xFFFFFFFF
+# hosts from sample_scan_01, in the order the spider visits them
+HOSTS = [
+    ((210, 3), "10.10.20.5", "up", "ssh http https"),
+    ((300, 3), "10.10.20.12", "up", "mysql"),
+    ((0, 3), "10.10.20.30", "up", "microsoft-ds ms-wbt-server"),
+    ((90, 3), "10.10.20.44", "up", "no open ports"),
+    ((150, 2), "10.10.20.99", "down", ""),
+]
 
 
-def noise(x: float, y: float, seed: int, wrap: int = 0) -> float:
-    """Smooth value noise; wrap > 0 makes it periodic in x."""
-    i, j = math.floor(x), math.floor(y)
-    fx, fy = x - i, y - j
-    fx, fy = fx * fx * (3 - 2 * fx), fy * fy * (3 - 2 * fy)
-
-    def h(a: int, b: int) -> float:
-        return _hash(a % wrap if wrap else a, b, seed)
-
-    top = h(i, j) * (1 - fx) + h(i + 1, j) * fx
-    bot = h(i, j + 1) * (1 - fx) + h(i + 1, j + 1) * fx
-    return top * (1 - fy) + bot * fy
+def spoke_pt(deg: float, r: float) -> tuple[float, float]:
+    a = math.radians(deg)
+    return CX + SX * r * math.cos(a), CY + r * math.sin(a)
 
 
-def fbm(x: float, y: float, seed: int, octaves: int = 4) -> float:
-    total, amp, norm = 0.0, 1.0, 0.0
-    for o in range(octaves):
-        total += amp * noise(x * 2**o, y * 2**o, seed + o)
-        norm += amp
-        amp *= 0.5
-    return total / norm
+def ring_pt(deg: float, r: float) -> tuple[float, float]:
+    """A point on a ring, where rings are straight chords between spokes."""
+    step = 360 / SPOKES
+    k = math.floor(deg / step)
+    f = deg / step - k
+    a, b = spoke_pt(k * step, r), spoke_pt((k + 1) * step, r)
+    return a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f
 
 
-# ----------------------------------------------------------------- shape
+def leg_points(a1: float, i1: int, a2: float, i2: int) -> list[tuple[float, float]]:
+    """Walk along strands: out or in along the spoke, then around the ring."""
+    r1, r2 = RINGS[i1], RINGS[i2]
+    pts = [spoke_pt(a1, r1 + (r2 - r1) * k / 30) for k in range(31)]
+    d = ((a2 - a1) % 360 + 540) % 360 - 180
+    n = max(2, math.ceil(abs(d) / 1.5))
+    pts += [ring_pt((a1 + d * k / n) % 360, r2) for k in range(1, n + 1)]
+    out = [pts[0]]
+    for p in pts[1:]:
+        if math.dist(p, out[-1]) > 0.01:
+            out.append(p)
+    return out
 
 
-def upper(dx: float) -> float:
-    t = max(0.0, 1 - (dx / EW) ** 2)
-    return -UP * t**0.72 * (1 + 0.12 * dx / EW)
+legs = []
+for i, ((a1, i1), *_rest) in enumerate(HOSTS):
+    (a2, i2), *_ = HOSTS[(i + 1) % len(HOSTS)]
+    pts = leg_points(a1, i1, a2, i2)
+    cum = [0.0]
+    for p, q in zip(pts, pts[1:], strict=False):
+        cum.append(cum[-1] + math.dist(p, q))
+    legs.append({"pts": pts, "cum": cum, "len": cum[-1], "walk": cum[-1] / SPEED * 1.35})
+
+T = sum(PAUSE + lg["walk"] for lg in legs)
+T = round(T / STEP) * STEP
+scale_t = T / sum(PAUSE + lg["walk"] for lg in legs)
+t0 = 0.0
+for lg in legs:
+    lg["pause"] = PAUSE * scale_t
+    lg["walk"] *= scale_t
+    lg["t0"] = t0
+    t0 += lg["pause"] + lg["walk"]
 
 
-def lower(dx: float) -> float:
-    t = max(0.0, 1 - (dx / EW) ** 2)
-    return LO * t**1.25 * (1 - 0.06 * dx / EW)
+def pos_at(tau: float) -> tuple[tuple[float, float], bool]:
+    tau %= T
+    for lg in legs:
+        if tau < lg["t0"] + lg["pause"] + lg["walk"]:
+            u = tau - lg["t0"]
+            if u < lg["pause"]:
+                return lg["pts"][0], False
+            f = (u - lg["pause"]) / lg["walk"]
+            target = (0.5 - 0.5 * math.cos(math.pi * f)) * lg["len"]
+            j = 1
+            while j < len(lg["cum"]) - 1 and lg["cum"][j] < target:
+                j += 1
+            a, b = lg["pts"][j - 1], lg["pts"][j]
+            la, lb = lg["cum"][j - 1], lg["cum"][j]
+            w = (target - la) / (lb - la) if lb > la else 0
+            return (a[0] + (b[0] - a[0]) * w, a[1] + (b[1] - a[1]) * w), True
+    return legs[0]["pts"][0], False
 
 
-def crease(dx: float) -> float:
-    return upper(dx) * 1.42 - 14 * max(0.0, 1 - (dx / (EW * 1.15)) ** 2)
+# heading: follows the direction of travel, smoothed; two passes so the loop closes
+n_frames = round(T / STEP)
+fine = 8
+heading = 0.0
+track = []
+for _pass in range(2):
+    track = []
+    for k in range(n_frames * fine):
+        t = k * STEP / fine
+        (ax, ay), _ = pos_at(t)
+        (bx, by), _ = pos_at(t + STEP / fine)
+        if math.hypot(bx - ax, by - ay) > 0.05:
+            want = math.atan2(by - ay, bx - ax)
+            d = (want - heading + math.pi) % (2 * math.pi) - math.pi
+            heading += d * min(1.0, STEP / fine * 7)
+        track.append((t, ax, ay, heading))
+
+# ----------------------------------------------------------------- spider frames
+
+gait = json.loads(gzip.decompress((ROOT / "assets/art/spider_gait.json.gz").read_bytes()))
+GC = gait["C"]
+GLYPH_SIZE = 6.7
+accent = {gait["pal"]["crim"], gait["pal"]["vio"]}
 
 
-# ----------------------------------------------------------------- iris
-
-FIBRES = 260
-
-
-def iris(x: float, y: float) -> float:
-    r = math.hypot(x, y)
-    a = math.atan2(y, x)
-    rn = (r - RP) / (R - RP)
-    turn = (a / (2 * math.pi)) % 1
-
-    # pupil ruff: a beaded rim right at the pupil edge
-    if rn < 0.035:
-        return 0.55 + 0.4 * (0.5 + 0.5 * math.sin(a * 46))
-
-    # fibres: fast across the angle, slow along the radius, a little wavy
-    u = turn * FIBRES + 2.5 * (noise(turn * 9, rn * 2.5, 3, wrap=9) - 0.5)
-    fib = 0.62 * noise(u, rn * 5.5, 7, wrap=FIBRES)
-    fib += 0.38 * noise(u * 0.4, rn * 2.5, 9, wrap=int(FIBRES * 0.4))
-    fib = fib**1.35
-
-    # collarette: a zigzag ring that splits the iris into two zones
-    rc = 0.34 + 0.035 * math.sin(a * 13 + 0.7) + 0.05 * (noise(turn * 24, 0.5, 4, wrap=24) - 0.5)
-    collar = math.exp(-(((rn - rc) / 0.04) ** 2))
-
-    if rn < rc:  # pupillary zone: finer, brighter, warmer
-        v = 0.42 + 0.42 * fib + 0.12 * (1 - rn / rc)
-    else:  # ciliary zone
-        v = 0.26 + 0.6 * fib
-
-    # crypts: dark lacunae scattered through the ciliary zone
-    cr = noise(turn * 34, rn * 4.2, 13, wrap=34)
-    band = smoothstep(rc + 0.02, rc + 0.12, rn) * (1 - smoothstep(0.62, 0.78, rn))
-    v *= 1 - 0.8 * smoothstep(0.6, 0.76, cr) * band
-
-    # contraction furrows: broken concentric dark arcs near the edge
-    furrow = sum(math.exp(-(((rn - c) / 0.016) ** 2)) for c in (0.69, 0.81))
-    v *= 1 - 0.55 * furrow * smoothstep(0.35, 0.65, noise(turn * 7, 0.5, 17, wrap=7))
-
-    v += 0.42 * collar * (0.6 + 0.4 * fib)
-
-    # limbal ring and light from the upper left
-    v *= 1 - 0.9 * smoothstep(0.82, 1.0, rn)
-    v *= 0.82 + 0.28 * max(0.0, math.cos(a - math.radians(-135)))
-    return v
-
-
-# ----------------------------------------------------------------- field
-
-
-def field(dx: float, dy: float) -> tuple[float, str]:
-    """Brightness at a point and the part of the eye it belongs to."""
-    top, bot = upper(dx), lower(dx)
-    ax = abs(dx) / EW
-
-    # outside the drawing: fade to black
-    e = (dx / (EW * 1.1)) ** 2 + ((dy + 8) / (UP * 1.6)) ** 2
-    fade = 1 - smoothstep(0.5, 1.0, e)
-    if fade <= 0:
-        return 0.0, "skin"
-
-    skin_tex = 0.82 + 0.36 * fbm(dx / 9, dy / 6, 31, 3)
-
-    if dy < top - 1.5:  # upper lid and brow
-        cz = crease(dx)
-        if dy > cz:  # the lid fold: rounded, catches light in the middle
-            t = (dy - cz) / max(1.0, top - cz)
-            v = 0.30 + 0.20 * math.sin(math.pi * min(1, t)) * (1 - 0.6 * ax)
-            v -= 0.25 * smoothstep(0.82, 1.0, t)  # lash line shadow
-        else:  # above the crease
-            v = 0.16 * (1 - smoothstep(0, 40, cz - dy)) * (1 - ax)
-        v *= 1 - 0.75 * math.exp(-(((dy - cz) / 4.5) ** 2))  # crease groove
-        if abs(dy - top) < 3.2:  # lid margin
-            v = 0.72 - 0.25 * ax
-        return max(0.0, v * skin_tex * fade), "skin"
-
-    if dy > bot + 1.5:  # lower lid and cheek
-        d = dy - bot
-        v = 0.06 + 0.16 * math.exp(-(((d - 18) / 10) ** 2)) * (1 - ax)
-        v *= 1 - 0.5 * math.exp(-(((d - 40) / 6) ** 2))
-        if d < 4.5:  # waterline, wet and bright
-            v = 0.40 + 0.22 * (1 - ax) * (0.5 + 0.5 * noise(dx / 5, 0, 41))
-        return max(0.0, v * skin_tex * fade), "skin"
-
-    # inside the opening
-    edge = min(dy - top, bot - dy)
-    lid_shadow = 0.28 + 0.72 * smoothstep(1, 30, dy - top)
-    x, y = dx - IX, dy - IY
-    r = math.hypot(x, y)
-
-    if r < RP:
-        return 0.0, "pupil"
-
-    if r < R:
-        v = 1.3 * iris(x, y) * lid_shadow
-        v *= 0.55 + 0.45 * smoothstep(0, 5, edge)
-        return v, "iris"
-
-    # caruncle in the inner corner
-    car = ((dx + EW - 26) / 20) ** 2 + ((dy - 6) / 13) ** 2
-    if car < 1:
-        return 0.24 + 0.22 * fbm(dx / 4, dy / 4, 51, 2) * (1 - car), "skin"
-
-    # sclera: a lit sphere, shadowed by the lid, with faint veins
-    v = 0.34 * (0.72 + 0.28 * (1 - (dx / (EW * 1.05)) ** 2))
-    v *= lid_shadow
-    v *= 1 - 0.6 * smoothstep(0.55, 1.0, ax)
-    v *= 1 - 0.38 * math.exp(-(((r - R) / 7) ** 2))  # shadow ring round the iris
-    ridge = 1 - abs(2 * fbm(dx / 22, dy / 14, 61, 3) - 1)
-    v *= 1 - 0.45 * smoothstep(0.9, 0.97, ridge) * smoothstep(0.35, 0.8, ax)
-    v *= 0.9 + 0.2 * noise(dx / 3, dy / 3, 71)
-    v *= 0.5 + 0.5 * smoothstep(0, 6, edge)
-    return v, "sclera"
-
-
-# ----------------------------------------------------------------- render
-
-eye = Layer()
-alt = Layer()  # second set of glyphs for the iris; the two cross-fade
-grid: dict[tuple[int, int], tuple[float, str]] = {}
-
-cols = int(2 * SPAN_X / CW)
-rows = int(2 * SPAN_Y / CH)
-for j in range(rows):
-    for i in range(cols):
-        grid[(i, j)] = field(-SPAN_X + i * CW, -SPAN_Y + j * CH)
-
-
-def cell(px: float, py: float) -> tuple[int, int]:
-    return round((px + SPAN_X) / CW), round((py + SPAN_Y) / CH)
-
-
-overrides: dict[tuple[int, int], tuple[float, str]] = {}
-
-
-def stroke_char(ang: float) -> str:
-    if 68 < ang < 112:
-        return "|"
-    if 22 < ang <= 68:
-        return "/"
-    if 112 <= ang < 158:
-        return "\\"
-    return "-"
-
-
-def stroke(points: list[tuple[float, float]], v0: float, v1: float) -> None:
-    for n, (px, py) in enumerate(points):
-        if n + 1 < len(points):
-            qx, qy = points[n + 1]
-        else:
-            qx, qy = px + (px - points[n - 1][0]), py + (py - points[n - 1][1])
-        ang = math.degrees(math.atan2(-(qy - py), qx - px)) % 180
-        v = v0 + (v1 - v0) * n / max(1, len(points) - 1)
-        key = cell(px, py)
-        if key not in overrides or overrides[key][0] < v:
-            overrides[key] = (v, stroke_char(ang))
-
-
-# upper lashes: dense, curling up and toward the outer corner
-for k in range(84):
-    t = -0.92 + 1.84 * (k + rnd.uniform(-0.3, 0.3)) / 83
-    dx0 = t * EW
-    x, y = dx0, upper(dx0) - 2
-    length = 20 + 22 * (1 - abs(t)) ** 0.6 + rnd.uniform(-5, 5)
-    lean = 0.25 + 0.75 * t
-    pts = []
-    steps = int(length / 2.4)
-    for s in range(steps):
-        f = s / steps
-        x += (lean * 0.9 + 0.5 * f * (1 if t > -0.2 else -1)) * 2.2
-        y -= (1.0 - 0.75 * f * f) * 2.4
-        pts.append((x, y))
-    stroke(pts, 0.8, 0.3)
-
-# lower lashes: short, sparse, pointing down and outward
-for k in range(26):
-    t = -0.78 + 1.6 * (k + rnd.uniform(-0.3, 0.3)) / 25
-    dx0 = t * EW
-    x, y = dx0, lower(dx0) + 5
-    pts = []
-    for s in range(int(3 + 3 * (1 - abs(t)) + rnd.random())):
-        x += (0.9 * t + 0.25 * s * t) * 2.4
-        y += 1.7
-        pts.append((x, y))
-    stroke(pts, 0.36, 0.14)
-
-# catchlight: a window reflection with a cross bar, and a small second spark
-win_x, win_y = IX - 30, IY - 30
-for j in range(-4, 5):
-    for i in range(-8, 9):
-        px, py = win_x + i * CW, win_y + j * CH
-        if abs(i * CW) <= 13 and abs(j * CH) <= 11:
-            bar = abs(i * CW) < 1.8 or abs(j * CH) < 1.6
-            overrides[cell(px, py)] = (0.45 if bar else 1.0, "")
-for px, py in [(IX + 22, IY + 20), (IX + 25, IY + 20), (IX + 22, IY + 25)]:
-    overrides[cell(px, py)] = (0.95, "")
-
-for (i, j), (v, part) in grid.items():
-    ch = ""
-    if (i, j) in overrides:
-        v, ch = overrides[(i, j)]
-        part = "line"
-    if v < 0.1:
-        continue
-    tone = min(1.0, v * 1.12) ** 0.85
-    x = round(CX - SPAN_X + i * CW, 1)
-    y = round(CY - SPAN_Y + j * CH, 1)
-    color = ramp(WARM, tone)
-    glyph = ch or ink.for_value(tone)
-    if part == "iris":
-        dxr, dyr = x - CX - IX, y - CY - IY
-        sector = int(((math.atan2(dyr, dxr) + math.pi) / (2 * math.pi)) * 12) % 12
-        eye.add(x, y, glyph, color, f"a{sector}")
-        alt.add(x, y, ink_alt.for_value(tone), color, f"b{sector}")
+def glyph_color(p: int, lvl: int, a: float) -> str:
+    if p in accent:
+        c = ramp(GOLD_RAMP, lvl / 6)
     else:
-        eye.add(x, y, glyph, color)
+        c = ramp(WARM, 0.22 + 0.78 * lvl / 6)
+    return mix(BG, c, max(0.0, min(1.0, a)))
 
 
-# glow: a blurred copy of the field under the glyphs, like light bleeding
-GS = 2.0  # glow sample spacing in px
-gw, gh = int(2 * SPAN_X / GS), int(2 * SPAN_Y / GS)
-lum = []
-for yy in range(gh):
-    row = []
-    for xx in range(gw):
-        dx, dy = -SPAN_X + xx * GS, -SPAN_Y + yy * GS
-        v, _ = field(dx, dy)
-        if math.hypot(dx - win_x, dy - win_y) < 14:
-            v = 1.2
-        row.append(max(0.0, min(1.2, v)))
-    lum.append(row)
-soft = box_blur(lum, 2)
-wide = box_blur(lum, 10)
-pixels = []
-for yy in range(gh):
-    prow = []
-    for xx in range(gw):
-        v = 0.75 * soft[yy][xx] + 0.55 * wide[yy][xx]
-        r, g, b = hex2rgb(ramp(WARM, min(1.0, v) ** 0.8))
-        k = min(1.0, v * 1.15)
-        prow.append((int(r * 255 * k), int(g * 255 * k), int(b * 255 * k)))
-    pixels.append(prow)
-GLOW = png_data_uri(pixels)
+def frame_svg(records: list) -> str:
+    runs: dict[str, list[tuple[float, float, str]]] = defaultdict(list)
+    for gx, gy, ch, p, lvl, a, _kind in records:
+        x = (gx + 0.5) * GC
+        y = (gy + 0.5) * GC + GLYPH_SIZE * 0.36
+        runs[glyph_color(p, lvl, a)].append((x, y, ch))
+    out = []
+    for color, gl in sorted(runs.items()):
+        gl.sort(key=lambda g: (g[1], g[0]))
+        xs = " ".join(num(round(x, 1)) for x, _, _ in gl)
+        ys = " ".join(num(round(y, 1)) for _, y, _ in gl)
+        chars = "".join(escape(c, quote=False) for _, _, c in gl)
+        out.append(f'<text x="{xs}" y="{ys}" fill="{color}">{chars}</text>')
+    return "".join(out)
 
 
-def outside(x: float, y: float) -> bool:
-    return (abs(x - CX) < SPAN_X + 10 and abs(y - CY) < SPAN_Y - 10) or (
-        720 < x < 1250 and 70 < y < 410
+def flipbook(frames: list, period: float, name: str) -> tuple[str, str]:
+    n = len(frames)
+    css = (
+        f"@keyframes {name}{{0%{{visibility:visible}}{100 / n:.3f}%,100%{{visibility:hidden}}}}"
+        f".{name}{{visibility:hidden;animation:{name} {period:.3f}s step-end infinite}}"
+    )
+    parts = []
+    for k, fr in enumerate(frames):
+        delay = -((n - k) % n) * period / n
+        parts.append(f'<g class="{name}" style="animation-delay:{delay:.3f}s">{frame_svg(fr)}</g>')
+    return "".join(parts), css
+
+
+walk_svg, walk_css = flipbook(gait["walk"], 0.62, "gw")
+idle_svg, idle_css = flipbook(gait["idle"], gait["idleT"], "gi")
+
+# ----------------------------------------------------------------- timing helpers
+
+css: list[str] = [walk_css, idle_css]
+_n = 0
+
+
+def windows(spans: list[tuple[float, float]], prop: str = "visibility") -> str:
+    """Keyframes (fractions of T) where an element is shown; returns a class name."""
+    global _n
+    _n += 1
+    on, off = ("visible", "hidden") if prop == "visibility" else ("1", "0")
+    pts = {0.0: off}
+    for a, b in spans:
+        pts[max(0.0, a)] = on
+        if b < 1:
+            pts[b] = off
+    if spans and spans[0][0] <= 0:
+        pts[0.0] = on
+    frames = "".join(f"{p * 100:.3f}%{{{prop}:{v}}}" for p, v in sorted(pts.items()))
+    name = f"k{_n}"
+    css.append(
+        f"@keyframes {name}{{{frames}}}.{name}{{{prop}:{off};animation:{name} {T:.3f}s step-end infinite}}"
+    )
+    return name
+
+
+walk_spans = [
+    ((lg["t0"] + lg["pause"]) / T, (lg["t0"] + lg["pause"] + lg["walk"]) / T) for lg in legs
+]
+idle_spans = [(lg["t0"] / T, (lg["t0"] + lg["pause"]) / T) for lg in legs]
+walk_cls, idle_cls = windows(walk_spans), windows(idle_spans)
+
+moves = "".join(
+    f"{t / T * 100:.3f}%{{transform:translate({x:.1f}px,{y:.1f}px) rotate({math.degrees(h):.1f}deg)}}"
+    for t, x, y, h in track[::fine]
+)
+t_end, x_end, y_end, h_end = track[0]
+moves += f"100%{{transform:translate({x_end:.1f}px,{y_end:.1f}px) rotate({math.degrees(heading):.1f}deg)}}"
+css.append(f"@keyframes crawl{{{moves}}}.crawl{{animation:crawl {T:.3f}s linear infinite}}")
+
+# ----------------------------------------------------------------- web glyphs
+
+
+def slope_char(dx: float, dy: float) -> str:
+    a = math.degrees(math.atan2(dy, dx)) % 180
+    if a < 22 or a >= 158:
+        return "-"
+    if a < 68:
+        return "\\"
+    if a < 112:
+        return "|"
+    return "/"
+
+
+def strand(
+    layer: Layer, p: tuple[float, float], q: tuple[float, float], color: str, step: float = 7.0
+) -> None:
+    n = max(1, round(math.dist(p, q) / step))
+    ch = slope_char(q[0] - p[0], q[1] - p[1])
+    for k in range(n + 1):
+        f = k / n
+        layer.add(
+            round(p[0] + (q[0] - p[0]) * f, 1), round(p[1] + (q[1] - p[1]) * f + 3, 1), ch, color
+        )
+
+
+web = Layer()
+outer = RINGS[-1]
+for s in range(SPOKES):
+    deg = s * 360 / SPOKES
+    strand(web, spoke_pt(deg, 6), spoke_pt(deg, outer + 14), "#4a3420")
+for i, r in enumerate(RINGS):
+    col = mix("#2e2216", "#5a3d22", i / (len(RINGS) - 1))
+    for s in range(SPOKES):
+        strand(web, spoke_pt(s * 30, r), spoke_pt((s + 1) * 30, r), col)
+# anchor threads out to the edges of the panel
+for p, q in [
+    (spoke_pt(210, outer + 14), (48, 82)),
+    (spoke_pt(330, outer + 14), (712, 82)),
+    (spoke_pt(150, outer + 14), (48, 456)),
+    (spoke_pt(30, outer + 14), (712, 456)),
+]:
+    strand(web, p, q, "#3a2a1a", 8)
+
+# strands the spider has walked stay lit until the loop restarts
+walked = []
+for lg in legs:
+    lit = Layer()
+    pts = lg["pts"]
+    for p, q in zip(pts[::6], pts[6::6], strict=False):
+        strand(lit, p, q, "#b8601d")
+    strand(lit, pts[-7 if len(pts) > 7 else 0], pts[-1], "#b8601d")
+    cls = windows([((lg["t0"] + lg["pause"] + lg["walk"]) / T, 0.995)])
+    walked.append(f'<g class="{cls}">{lit.svg()}</g>')
+
+# host nodes and their small address labels
+nodes = []
+for i, ((deg, ring), ip, status, _svc) in enumerate(HOSTS):
+    x, y = spoke_pt(deg, RINGS[ring])
+    lg = legs[i]
+    seen = windows([(lg["t0"] / T, 0.995)])
+    dx, dy = math.cos(math.radians(deg)), math.sin(math.radians(deg))
+    lx, ly = x + dx * 26, y + dy * 18 + 4
+    anchor = "start" if dx > 0.3 else "end" if dx < -0.3 else "middle"
+    lit_col = "#ffd486" if status == "up" else "#a4553a"
+    nodes.append(
+        f'<text x="{num(round(x, 1))}" y="{num(round(y + 4, 1))}" font-size="12" fill="#6b4524" '
+        f'text-anchor="middle">o</text>'
+        f'<text class="{seen}" x="{num(round(x, 1))}" y="{num(round(y + 4, 1))}" font-size="13" '
+        f'font-weight="700" fill="{lit_col}" text-anchor="middle">@</text>'
+        f'<text x="{num(round(lx, 1))}" y="{num(round(ly, 1))}" font-size="10" fill="#6e5840" '
+        f'text-anchor="{anchor}" letter-spacing=".5" stroke="{BG}" stroke-width="4" '
+        f'paint-order="stroke">{ip}</text>'
     )
 
-
-sky = Layer()
-stars(sky, W, H, 260, seed=4, avoid=outside)
-sky.items = [(x, y, c, mix(BG, "#8f4312", 0.6), cls) for x, y, c, _, cls in sky.items]
-
-# ----------------------------------------------------------------- title side
+# ----------------------------------------------------------------- right side
 
 TX = 760
 title_svg = pixel_blocks(
-    "RECON", TX, 166, 15, [(0, "#fff0d2"), (0.6, "#ffc562"), (1, "#f08a24")], shadow="#3a1c0a"
+    "RECON", TX, 150, 15, [(0, "#fff0d2"), (0.6, "#ffc562"), (1, "#f08a24")], shadow="#3a1c0a"
 )
 
-css = "\n".join(
-    [
-        "@keyframes fa{0%,45%{opacity:1}48%,95%{opacity:0}98%,100%{opacity:1}}",
-        "@keyframes fb{0%,45%{opacity:0}48%,95%{opacity:1}98%,100%{opacity:0}}",
-        *(f".a{k}{{animation:fa 12s ease-in-out {-k}s infinite}}" for k in range(12)),
-        *(f".b{k}{{animation:fb 12s ease-in-out {-k}s infinite}}" for k in range(12)),
-        ".tw1{animation:tw 4.1s ease-in-out infinite}",
-        ".tw2{animation:tw 5.3s ease-in-out -1.7s infinite}",
-        ".tw3{animation:tw 6.7s ease-in-out -3.2s infinite}",
-        "@keyframes tw{0%,100%{opacity:1}50%{opacity:.25}}",
-        "@media (prefers-reduced-motion:reduce){*{animation:none!important}"
-        + ",".join(f".b{k}" for k in range(12))
-        + "{opacity:0}}",
-    ]
+readout = [
+    f'<text x="{TX}" y="346" font-size="12" fill="{FAINT}" letter-spacing="1.5">SUMMARY.HOSTS[]</text>'
+]
+for i, (_node, ip, status, svc) in enumerate(HOSTS):
+    lg = legs[i]
+    shown = windows([((lg["t0"] + 0.25) / T, 0.995)])
+    y = 372 + i * 19
+    col = INK if status == "up" else "#c96a45"
+    readout.append(
+        f'<g class="{shown}" font-size="13">'
+        f'<text x="{TX}" y="{y}" fill="{col}">{ip}</text>'
+        f'<text x="{TX + 118}" y="{y}" fill="{DIM}">{status}</text>'
+        f'<text x="{TX + 168}" y="{y}" fill="#d9a35c">{escape(svc)}</text></g>'
+    )
+reading = []
+for i, lg in enumerate(legs):
+    cur = windows([(lg["t0"] / T, (lg["t0"] + lg["pause"]) / T)])
+    y = 372 + i * 19
+    reading.append(
+        f'<text class="{cur}" x="{TX - 16}" y="{y}" font-size="13" fill="#ffc562">&gt;</text>'
+    )
+
+sky = Layer()
+stars(
+    sky,
+    W,
+    H,
+    200,
+    seed=4,
+    avoid=lambda x, y: (x > 720 and 90 < y < 470) or (60 < y < 470 and x < 720),
+)
+sky.items = [(x, y, c, mix(BG, "#8f4312", 0.55), cls) for x, y, c, _, cls in sky.items]
+
+css.append(
+    ".tw1{animation:tw 4.1s ease-in-out infinite}"
+    ".tw2{animation:tw 5.3s ease-in-out -1.7s infinite}"
+    ".tw3{animation:tw 6.7s ease-in-out -3.2s infinite}"
+    "@keyframes tw{0%,100%{opacity:1}50%{opacity:.25}}"
+    "@media (prefers-reduced-motion:reduce){*{animation:none!important}"
+    ".gw,.gi{visibility:hidden}.gi:first-child{visibility:visible}}"
 )
 
 body = f"""
 <rect width="{W}" height="{H}" fill="{BG}"/>
 <defs>
-  <radialGradient id="warmth" cx="{CX + IX}" cy="{CY + IY}" r="330" gradientUnits="userSpaceOnUse">
-    <stop offset="0" stop-color="#f08a24" stop-opacity=".16"/>
-    <stop offset=".5" stop-color="#8f4312" stop-opacity=".06"/>
+  <radialGradient id="warmth" cx="{CX}" cy="{CY}" r="300" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#f08a24" stop-opacity=".10"/>
     <stop offset="1" stop-color="#8f4312" stop-opacity="0"/>
   </radialGradient>
+  <radialGradient id="body-glow">
+    <stop offset="0" stop-color="#f08a24" stop-opacity=".22"/>
+    <stop offset="1" stop-color="#f08a24" stop-opacity="0"/>
+  </radialGradient>
 </defs>
-<ellipse cx="{CX + IX}" cy="{CY + IY}" rx="380" ry="230" fill="url(#warmth)"/>
-<g font-size="10">
-{sky.svg()}
-</g>
-<image href="{GLOW}" x="{CX - SPAN_X}" y="{CY - SPAN_Y}" width="{2 * SPAN_X}" height="{2 * SPAN_Y}" opacity=".42" preserveAspectRatio="none"/>
-<g font-size="{FONT_SIZE}" font-weight="700">
-{eye.svg()}
-{alt.svg()}
+<ellipse cx="{CX}" cy="{CY}" rx="360" ry="220" fill="url(#warmth)"/>
+<g font-size="10">{sky.svg()}</g>
+<g font-size="11" font-weight="700">{web.svg()}{"".join(walked)}</g>
+<g>{"".join(nodes)}</g>
+
+<g class="crawl">
+  <ellipse cx="10" cy="0" rx="62" ry="48" fill="url(#body-glow)"/>
+  <g font-size="{GLYPH_SIZE}" font-weight="700" text-anchor="middle">
+    <g class="{walk_cls}">{walk_svg}</g>
+    <g class="{idle_cls}">{idle_svg}</g>
+  </g>
 </g>
 
 <g font-size="12" fill="{DIM}" letter-spacing="2">
@@ -404,18 +386,16 @@ body = f"""
 </g>
 <line x1="40" y1="58" x2="{W - 40}" y2="58" stroke="{FAINT}" stroke-width="1"/>
 
-<rect x="{TX}" y="118" width="214" height="28" fill="{INK}"/>
-<text x="{TX + 12}" y="137" font-size="13" fill="{BG}" letter-spacing="1.5">AGENT 01 . PENTEST POC</text>
-
+<rect x="{TX}" y="102" width="214" height="28" fill="{INK}"/>
+<text x="{TX + 12}" y="121" font-size="13" fill="{BG}" letter-spacing="1.5">AGENT 01 . PENTEST POC</text>
 {title_svg}
-
-<text x="{TX}" y="318" font-size="25" fill="{INK}" letter-spacing="5">summarization agent</text>
-<text x="{TX}" y="356" font-size="14" fill="{DIM}">reads a synthetic scan, writes a summary</text>
-<text x="{TX}" y="378" font-size="14" fill="{DIM}">the next agent can trust. nothing invented.</text>
+<text x="{TX}" y="300" font-size="25" fill="{INK}" letter-spacing="5">summarization agent</text>
+{"".join(readout)}
+{"".join(reading)}
 
 <line x1="40" y1="{H - 46}" x2="{W - 40}" y2="{H - 46}" stroke="{FAINT}" stroke-width="1"/>
 <g font-size="12" fill="{DIM}" letter-spacing="1.5">
-  <text x="40" y="{H - 22}">drawn with its own source code</text>
+  <text x="40" y="{H - 22}">walks the scan host by host. nothing invented.</text>
   <text x="{W - 40}" y="{H - 22}" text-anchor="end">python . langgraph . synthetic data only</text>
 </g>
 """
@@ -424,12 +404,11 @@ svg = svg_doc(
     W,
     H,
     "Recon Summarization Agent",
-    "A detailed eye drawn in warm amber source-code characters next to the project name. "
-    "The characters in the iris slowly change, like live code.",
+    "An ASCII spider walks a web whose nodes are scanned hosts, stopping at each one, "
+    "while a summary of each host appears next to the project name.",
     body,
-    css,
+    "".join(css),
 )
 out = ROOT / "assets" / "banner.svg"
 out.write_text(svg, encoding="utf-8")
-glyphs = len(eye.items) + len(alt.items)
-print(f"wrote {out.relative_to(ROOT)} ({len(svg) // 1024} KB, {glyphs} glyphs)")
+print(f"wrote {out.relative_to(ROOT)} ({len(svg) // 1024} KB, loop {T:.2f}s)")

@@ -195,11 +195,11 @@ css.append(
     + "}"
 )
 css.append(show_window("tokfade", 0.02, 0.96, 0.02))
+# The lit line is revealed by a clip rectangle that rides the same CSS animation
+# as the token, so its edge always sits under the token (one clock, no drift).
 fill_clip = (
-    f'<clipPath id="filled"><rect x="36" y="{RAIL - 20}" height="30" width="0">'
-    f'<animate attributeName="width" values="{";".join(f"{x - 36:.1f}" for _, x in pts)}" '
-    f'keyTimes="{";".join(f"{p:.4f}" for p, _ in pts)}" calcMode="spline" '
-    f'keySplines="{";".join([".6 0 .4 1"] * (len(pts) - 1))}" dur="{T}s" repeatCount="indefinite"/></rect></clipPath>'
+    f'<clipPath id="filled"><rect x="-2400" y="{RAIL - 20}" height="30" width="2400" '
+    f'style="animation:tok {T}s cubic-bezier(.6,0,.4,1) infinite"/></clipPath>'
 )
 
 # what the token carries on each leg
