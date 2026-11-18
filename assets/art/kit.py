@@ -275,8 +275,8 @@ def pixel_blocks(
     return out + "<g>" + "".join(front) + "</g>"
 
 
-def png_data_uri(pixels: list[list[tuple[int, int, int]]]) -> str:
-    """Encode rows of RGB tuples as a base64 PNG data URI (no dependencies)."""
+def png_data_uri(pixels: list[list[tuple[int, ...]]]) -> str:
+    """Encode rows of RGB or RGBA tuples as a base64 PNG data URI (no dependencies)."""
     import base64
     import struct
     import zlib
@@ -289,7 +289,9 @@ def png_data_uri(pixels: list[list[tuple[int, int, int]]]) -> str:
         return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body))
 
     png = b"\x89PNG\r\n\x1a\n"
-    png += chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+    png += chunk(
+        b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 6 if len(pixels[0][0]) == 4 else 2, 0, 0, 0)
+    )
     png += chunk(b"IDAT", zlib.compress(raw, 9))
     png += chunk(b"IEND", b"")
     return "data:image/png;base64," + base64.b64encode(png).decode()

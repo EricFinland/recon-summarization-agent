@@ -3,10 +3,12 @@
 Run from the repo root:  python assets/art/banner.py
 Writes assets/banner.svg.
 
-The turtle comes from turtle_swim.json.gz: glyph frames of one full flipper
-stroke, recorded from an ASCII creature engine. Each turtle on the banner reuses
-those frames (SVG <use>), at its own size, depth, speed and heading, and surges
-forward on the power stroke. Everything is CSS animation with no scripts.
+The turtles come from turtle_swim.json.gz: glyph frames of one full flipper
+stroke, recorded from an ASCII creature engine at two headings (swimming right
+and swimming left), with the engine's own palette. They are drawn the way the
+engine draws them: upright glyphs on an 8 px grid, a faint colour tile behind
+every interior glyph, and a soft bloom baked from the same frames. Each turtle
+surges forward on the power stroke. Everything is CSS animation, no scripts.
 """
 
 from __future__ import annotations
@@ -24,59 +26,115 @@ from kit import (
     FAINT,
     INK,
     ROOT,
-    SEA,
     SUNSET,
     Layer,
+    box_blur,
+    hex2rgb,
     mix,
     num,
     pixel_blocks,
-    ramp,
+    png_data_uri,
     stars,
     svg_doc,
 )
 
 W, H = 1280, 520
 PANEL = (0, 59, 744, 415)  # x, y, w, h of the water on the left
-SKIN = [(0.0, "#0b1b1e"), (0.45, "#5f8276"), (1.0, "#f3e7c6")]
 rnd = random.Random(11)
 
 # ----------------------------------------------------------------- turtle frames
 
 swim = json.loads(gzip.decompress((ROOT / "assets/art/turtle_swim.json.gz").read_bytes()))
-GC = swim["C"]
-FRAMES = swim["frames"]
-NF = len(FRAMES)
-GLYPH_SIZE = 6.7
-PAL = swim["pal"]
+GC = swim["C"]  # 8 px cells, as in the engine
+CELL_FONT, GLYPH_FONT = GC + 3, GC + 2  # the engine's glyph sizes
+NF = len(swim["right"]["frames"])
 
 
-def glyph_color(p: int, lvl: int, a: float) -> str:
-    if p == PAL["shell"]:
-        c = ramp(SEA, 0.18 + 0.82 * lvl / 6)
-    elif p == PAL["eye"]:
-        c = "#f0fffa" if lvl >= 5 else "#04121a"
-    else:
-        c = ramp(SKIN, 0.12 + 0.88 * lvl / 6)
-    return mix(BG, c, max(0.0, min(1.0, a)))
+def css_hex(c: str) -> str:
+    r, g, b = (int(v) for v in c[c.index("(") + 1 : c.index(")")].split(","))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+PALS = {swim["pal"][k]: [css_hex(c) for c in v] for k, v in swim["css"].items()}
 
 
 def frame_svg(records: list) -> str:
-    runs: dict[str, list[tuple[float, float, str]]] = defaultdict(list)
-    for gx, gy, ch, p, lvl, a, _kind in records:
+    tiles: dict[str, list[str]] = defaultdict(list)
+    runs: dict[tuple[str, float, int], list[tuple[float, float, str]]] = defaultdict(list)
+    for gx, gy, ch, p, lvl, a, kind in records:
+        pal = PALS[p]
+        if kind == "c":  # interior glyphs sit on a faint tile of their colour
+            tiles[pal[max(1, lvl - 1)]].append(f"M{num(gx * GC)} {num(gy * GC)}h{GC}v{GC}h-{GC}z")
+        size = GLYPH_FONT if kind == "g" else CELL_FONT
         x = (gx + 0.5) * GC
-        y = (gy + 0.5) * GC + GLYPH_SIZE * 0.36
-        runs[glyph_color(p, lvl, a)].append((x, y, ch))
-    out = []
-    for color, gl in sorted(runs.items()):
+        y = (gy + 0.5) * GC + size * 0.36
+        runs[(pal[lvl], round(min(1.0, a), 1), size)].append((x, y, ch))
+    out = ['<g opacity=".2">']
+    out += [f'<path fill="{c}" d="{"".join(d)}"/>' for c, d in sorted(tiles.items())]
+    out.append("</g>")
+    for (color, a, size), gl in sorted(runs.items()):
         gl.sort(key=lambda g: (g[1], g[0]))
         xs = " ".join(num(round(x, 1)) for x, _, _ in gl)
         ys = " ".join(num(round(y, 1)) for _, y, _ in gl)
         chars = "".join(escape(c, quote=False) for _, _, c in gl)
-        out.append(f'<text x="{xs}" y="{ys}" fill="{color}">{chars}</text>')
+        op = "" if a >= 1 else f' fill-opacity="{a:g}"'
+        out.append(f'<text x="{xs}" y="{ys}" fill="{color}" font-size="{size}"{op}>{chars}</text>')
     return "".join(out)
 
 
-frame_defs = "".join(f'<g id="t{k}">{frame_svg(fr)}</g>' for k, fr in enumerate(FRAMES))
+def bloom(frames: list) -> tuple[str, float, float, float, float]:
+    """The engine's bloom, baked: the drawn layer averaged over the stroke, blurred three ways."""
+    sub = 2  # image pixels per cell
+    pad = 7  # cells of room for the glow
+    xs = [r[0] for f in frames for r in f]
+    ys = [r[1] for f in frames for r in f]
+    x0, y0 = min(xs) - pad, min(ys) - pad
+    w, h = (max(xs) - x0 + pad + 1) * sub, (max(ys) - y0 + pad + 1) * sub
+    acc = [[[0.0, 0.0, 0.0] for _ in range(w)] for _ in range(h)]
+    for f in frames:
+        for gx, gy, _ch, p, lvl, a, kind in f:
+            pal = PALS[p]
+            glyph = [c * 0.32 * a for c in hex2rgb(pal[lvl])]
+            tile = [c * 0.2 for c in hex2rgb(pal[max(1, lvl - 1)])] if kind == "c" else [0, 0, 0]
+            for sy in range(sub):
+                for sx in range(sub):
+                    px = acc[(gy - y0) * sub + sy][(gx - x0) * sub + sx]
+                    for i in range(3):
+                        px[i] += (glyph[i] + tile[i]) / len(frames)
+    chans = [[[px[i] for px in row] for row in acc] for i in range(3)]
+    out = [[[0.0, 0.0, 0.0] for _ in range(w)] for _ in range(h)]
+    for radius, weight in ((1, 0.3), (3, 0.45), (6, 0.55)):
+        for i in range(3):
+            bl = box_blur(chans[i], radius)
+            for yy in range(h):
+                for xx in range(w):
+                    out[yy][xx][i] += bl[yy][xx] * weight
+    pixels = []
+    for row in out:
+        prow = []
+        for r, g, b in row:
+            # glow strength becomes alpha and the hue stays the colour, so it blends on any background
+            lum = max(r, g, b) * 2.3
+            s = 2.3 / lum if lum > 0 else 0.0
+            rgb = (
+                min(255, int(r * s * 255)),
+                min(255, int(g * s * 255)),
+                min(255, int(b * s * 255)),
+            )
+            prow.append((*rgb, int(min(1.0, lum) * 255)))
+        pixels.append(prow)
+    return png_data_uri(pixels), x0 * GC, y0 * GC, w * GC / sub, h * GC / sub
+
+
+sets = {}
+for side in ("right", "left"):
+    frames = swim[side]["frames"]
+    uri, bx, by, bw, bh = bloom(frames)
+    defs = [
+        f'<image id="glow-{side}" href="{uri}" x="{num(bx)}" y="{num(by)}" width="{num(bw)}" height="{num(bh)}"/>'
+    ]
+    defs += [f'<g id="{side}{k}">{frame_svg(fr)}</g>' for k, fr in enumerate(frames)]
+    sets[side] = {"ang": swim[side]["ang"], "defs": "".join(defs)}
 
 # ----------------------------------------------------------------- the turtles
 
@@ -90,48 +148,38 @@ def surge(row: float) -> float:
     return 0.35 + 0.65 * max(0.0, math.sin(row)) ** 1.5
 
 
-# (scale, opacity, stroke period s, strokes per crossing, start, end, wobble px, phase 0..1)
+# (heading set, start x, start y, stroke period s, strokes per crossing, opacity, phase 0..1)
 TURTLES = [
-    (0.52, 0.42, 4.8, 6, (-90, 352), (840, 300), 18, 0.55),
-    (0.68, 0.62, 4.2, 5, (840, 150), (-110, 214), 24, 0.15),
-    (1.00, 1.00, 3.6, 7, (-150, 268), (900, 196), 30, 0.38),
-    (0.44, 0.36, 5.2, 5, (820, 392), (-90, 360), 12, 0.8),
+    ("right", -110, 400, 3.6, 7, 1.0, 0.30),
+    ("left", 860, 250, 4.0, 6, 1.0, 0.05),
+    ("right", -110, 238, 4.4, 6, 0.9, 0.78),
+    ("left", 860, 430, 4.8, 5, 0.8, 0.55),
 ]
 
 turtle_svg = []
-for i, (sc, op, period, strokes, (x0, y0), (x1, y1), wob, phase) in enumerate(TURTLES):
+for i, (side, x0, y0, period, strokes, op, phase) in enumerate(TURTLES):
     T = period * strokes
-    # distance covered follows the stroke, so the turtle surges as its flippers push
-    n = 240
+    ang = sets[side]["ang"]
+    dist = 980
+    dx, dy = math.cos(ang) * dist, math.sin(ang) * dist
+    n = 200
     acc = [0.0]
     for k in range(n):
         acc.append(acc[-1] + surge(2 * math.pi * strokes * (k + 0.5) / n))
-    keys = []
-    for k in range(n + 1):
-        f = acc[k] / acc[-1]
-        x = x0 + (x1 - x0) * f
-        y = y0 + (y1 - y0) * f + wob * math.sin(2 * math.pi * (k / n) * 1.5 + i)
-        keys.append((k / n, x, y))
-    frames = []
-    for k, (p, x, y) in enumerate(keys):
-        q = keys[min(k + 1, n)]
-        r = keys[max(k - 1, 0)]
-        ang = math.degrees(math.atan2(q[2] - r[2], q[1] - r[1]))
-        frames.append(
-            f"{p * 100:.2f}%{{transform:translate({x:.1f}px,{y:.1f}px) rotate({ang:.1f}deg)}}"
-        )
-    css.append(f"@keyframes sw{i}{{{''.join(frames)}}}")
+    keys = "".join(
+        f"{k / n * 100:.2f}%{{transform:translate({x0 + dx * acc[k] / acc[-1]:.1f}px,"
+        f"{y0 + dy * acc[k] / acc[-1]:.1f}px)}}"
+        for k in range(n + 1)
+    )
+    css.append(f"@keyframes sw{i}{{{keys}}}")
     delay = -phase * T
     css.append(f".sw{i}{{animation:sw{i} {T:.2f}s linear {delay:.2f}s infinite}}")
     css.append(f".f{i}{{visibility:hidden;animation:fl {period:.2f}s step-end infinite}}")
-    uses = []
+    uses = [f'<use href="#glow-{side}"/>']
     for k in range(NF):
         d = -((NF - k) % NF) * period / NF + delay
-        uses.append(f'<use href="#t{k}" class="f{i}" style="animation-delay:{d:.3f}s"/>')
-    turtle_svg.append(
-        f'<g class="sw{i}" opacity="{op}"><g transform="scale({sc})">'
-        f'<ellipse cx="0" cy="0" rx="78" ry="64" fill="url(#shell-glow)"/>{"".join(uses)}</g></g>'
-    )
+        uses.append(f'<use href="#{side}{k}" class="f{i}" style="animation-delay:{d:.3f}s"/>')
+    turtle_svg.append(f'<g class="sw{i}" opacity="{op}">{"".join(uses)}</g>')
 
 # ----------------------------------------------------------------- the water
 
@@ -211,10 +259,6 @@ body = f"""
     <stop offset="0" stop-color="#9ee8d4" stop-opacity=".09"/>
     <stop offset="1" stop-color="#9ee8d4" stop-opacity="0"/>
   </linearGradient>
-  <radialGradient id="shell-glow">
-    <stop offset="0" stop-color="#3fc6b0" stop-opacity=".16"/>
-    <stop offset="1" stop-color="#3fc6b0" stop-opacity="0"/>
-  </radialGradient>
   <linearGradient id="edges" x1="0" x2="1">
     <stop offset="0" stop-color="#000"/>
     <stop offset=".07" stop-color="#fff"/>
@@ -224,14 +268,15 @@ body = f"""
   <mask id="water" maskUnits="userSpaceOnUse" x="{px}" y="{py}" width="{pw}" height="{ph}">
     <rect x="{px}" y="{py}" width="{pw}" height="{ph}" fill="url(#edges)"/>
   </mask>
-  {frame_defs}
+  {sets["right"]["defs"]}
+  {sets["left"]["defs"]}
 </defs>
 <rect x="0" y="{py}" width="{W}" height="{ph}" fill="url(#depth)"/>
 <g font-size="10">{drift.svg()}</g>
 <g mask="url(#water)">
   {rays}
   <g>{"".join(bubbles)}</g>
-  <g font-size="{GLYPH_SIZE}" font-weight="700" text-anchor="middle">{"".join(turtle_svg)}</g>
+  <g font-weight="700" text-anchor="middle">{"".join(turtle_svg)}</g>
 </g>
 
 <g font-size="12" fill="{DIM}" letter-spacing="2">
